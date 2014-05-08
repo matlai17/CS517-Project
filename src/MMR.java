@@ -4,6 +4,7 @@ import SimMetrics.SimMetric;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -25,10 +26,10 @@ import java.util.TreeSet;
  */
 public class MMR {
     
-    class Document_Score
+    static class Document_Score
     {
-        List<String> document;
-        double score;
+        private List<String> document;
+        private double score;
         public Document_Score(List<String> document, double score)
         {
             this.document = document;
@@ -43,6 +44,12 @@ public class MMR {
     static final int GRAPH_SIM = 1;
     static final int COSINE_SIM = 2;
     static final int PSEUDO_CODE_SIM = 3;
+    
+    public MMR()
+    {
+        sim1 = new CosineSim();
+        sim2 = new CosineSim(); 
+    }
     
     public MMR(int sim1Type, int sim2Type)
     {
@@ -73,27 +80,39 @@ public class MMR {
         }
     }
     
-    public List<List<String>> resultList(List<List<String>> sentenceList, List<String> query, double lambda, int maxResults)
+    public List<List<String>> rankedList(List<List<String>> sentenceList, List<String> query, double lambda, int maxResults)
     {
-        TreeSet<Map.Entry<List<String>,Integer>> selectedDocuments = new TreeSet<>(new Comparator<Map.Entry<List<String>, Integer>>() {
+        TreeSet<Document_Score> sList = new TreeSet<>(new Comparator<Document_Score>() {
 
             @Override
-            public int compare(Map.Entry<List<String>, Integer> o1, Map.Entry<List<String>, Integer> o2) {
-                return -(o1.getValue()).compareTo(o2.getValue());
+            public int compare(Document_Score o1, Document_Score o2) {
+                return -Double.compare(o1.getScore(), o2.getScore());
             }
         });
         
-        ArrayList<List<String>> clonedList = new ArrayList<List<String>>(sentenceList);
+        ArrayList<List<String>> r_sList = new ArrayList<>(sentenceList);
         
+        while(!r_sList.isEmpty())
+        {
+            Document_Score retrievedDocument = retrieveDocument(r_sList, sList, query, lambda);
+            sList.add(retrievedDocument);
+            r_sList.remove(retrievedDocument.getDocument());
+        }
         
+        ArrayList<List<String>> rankedList = new ArrayList<>();
+        for(Document_Score ds : sList) 
+        {
+            rankedList.add(ds.getDocument());
+            if(rankedList.size() >= maxResults) break;
+        }
         
-        return new ArrayList<List<String>>();
+        return rankedList;
     }
     
-    public Document_Score retrieveDocument(List<List<String>> unselectedDocuments, List<List<String>> selectedDocuments, List<String> query, double lambda)
+    private Document_Score retrieveDocument(List<List<String>> unselectedDocuments, TreeSet<Document_Score> selectedDocuments, List<String> query, double lambda)
     {
         List<String> bestDocument = unselectedDocuments.get(0);
-        double maxScore = Double.MIN_VALUE;
+        double maxScore = 0;
         for(List<String> document : unselectedDocuments)
         {
             double score = lambda * (sim1.sentenceRank(document, query) - ((1 - lambda) * maxSim2(document, selectedDocuments)));
@@ -106,59 +125,49 @@ public class MMR {
         return new Document_Score(bestDocument, maxScore);
     }
     
-    private double maxSim2(List<String> unselectedDocument, List<List<String>> selectedDocuments)
+    private double maxSim2(List<String> unselectedDocument, TreeSet<Document_Score> selectedDocuments)
     {
-        double maxScore = Double.MIN_VALUE;
-        for(List<String> document : selectedDocuments)
+        double maxScore = 0;
+        Iterator<Document_Score> it = selectedDocuments.iterator();
+        while(it.hasNext())
         {
+            List<String> document = it.next().getDocument();
             double score = sim2.sentenceRank(unselectedDocument, document);
             if(score > maxScore) maxScore = score;
         }
         return maxScore;
     }
     
-//    private static Map<List<String>, Double> sortByValue(Map<List<String>, Double> map)
-//    {
-//        List<Map.Entry<List<String>, Double>> list = new LinkedList<Map.Entry<List<String>, Double>>(map.entrySet());
-//        Collections.sort(list, new Comparator<Map.Entry<List<String>, Double>>()
-//        {
-//            @Override
-//            public int compare(Map.Entry<List<String>, Double> o1, Map.Entry<List<String>, Double> o2) 
-//            {
-//                return -(o1.getValue()).compareTo(o2.getValue());
-//            }
-//        } );
-//        
-//        Map<List<String>, Double> result = new LinkedHashMap<List<String>, Double>();
-//        for(Map.Entry<List<String>, Double> entry : list)
-//        {
-//            result.put(entry.getKey(), entry.getValue());
-//        }
-//        return result;
-//    }
-    
-//    private static Map<String, Double> sortByValue2(Map<String, Double> map)
-//    {
-//        List<Map.Entry<String, Double>> list = new LinkedList<Map.Entry<String, Double>>(map.entrySet());
-//        Collections.sort(list, new Comparator<Map.Entry<String, Double>>()
-//        {
+    public static void main(String[] args) {
+        
+//        TreeSet<Document_Score> selectedDocuments = new TreeSet<>(new Comparator<Document_Score>() {
 //
 //            @Override
-//            public int compare(Map.Entry<String, Double> o1, Map.Entry<String, Double> o2) 
-//            {
-//                return -(o1.getValue()).compareTo(o2.getValue());
+//            public int compare(Document_Score o1, Document_Score o2) {
+//                return -Double.compare(o1.getScore(), o2.getScore());
 //            }
-//        } );
+//        });
 //        
-//        Map<String, Double> result = new LinkedHashMap<String, Double>();
-//        for(Map.Entry<String, Double> entry : list)
+//        ArrayList<String> one = new ArrayList<>();
+//        one.add("one");
+//        ArrayList<String> two = new ArrayList<>();
+//        one.add("two");
+//        ArrayList<String> three = new ArrayList<>();
+//        one.add("three");
+//        ArrayList<String> four = new ArrayList<>();
+//        one.add("four");
+//        
+//        selectedDocuments.add(new Document_Score(one, .2));
+//        selectedDocuments.add(new Document_Score(one, .4));
+//        selectedDocuments.add(new Document_Score(one, .3));
+//        selectedDocuments.add(new Document_Score(one, .1));
+//        Iterator<Document_Score> it = selectedDocuments.iterator();
+//        while(it.hasNext())
 //        {
-//            result.put(entry.getKey(), entry.getValue());
+//            Document_Score ds = it.next();
+//            System.out.println(ds.getScore());
 //        }
-//        return result;
-//    }
-//    
-//    public static void main(String[] args) {
+        
 //        HashMap<String, Double> testMap = new HashMap<>();
 //        testMap.put("test2", .2);
 //        testMap.put("test6", .6);
@@ -171,5 +180,5 @@ public class MMR {
 //        {
 //            System.out.println(entry.getKey());
 //        }
-//    }
+    }
 }
