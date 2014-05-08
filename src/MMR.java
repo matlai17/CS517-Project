@@ -1,4 +1,6 @@
 
+import SimMetrics.SimMetric;
+import SimMetrics.CosineSim;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
