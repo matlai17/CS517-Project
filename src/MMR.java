@@ -1,35 +1,31 @@
 
 import SimMetrics.CosineSim;
 import SimMetrics.SimMetric;
+
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-import java.util.SortedMap;
-import java.util.TreeMap;
 import java.util.TreeSet;
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 /**
- *
+ * A Multi-Document ranking and summarization program the implements the algorithm set
+ * forth in the published report "The Use of MMR, Diversity-Based Reranking for Reordering
+ * Documents and Producing Summaries". Allows ranking of documents, not only by their 
+ * relevance to a query, but by their marginality to other relevant documents.
+ * 
  * @author Matthew Lai
  */
 public class MMR {
     
-    static class Document_Score
+    /**
+     * Document_Score is a private class to pass and store the tuple of a document
+     * and its MMR score.
+     */
+    private class Document_Score
     {
-        private List<String> document;
-        private double score;
+        private final List<String> document;
+        private final double score;
         public Document_Score(List<String> document, double score)
         {
             this.document = document;
@@ -41,9 +37,10 @@ public class MMR {
     
     SimMetric sim1;
     SimMetric sim2;
-    static final int GRAPH_SIM = 1;
-    static final int COSINE_SIM = 2;
-    static final int PSEUDO_CODE_SIM = 3;
+    static final int GRAPH_SIM = SimMetric.GRAPH_SIM;
+    static final int COSINE_SIM = SimMetric.COSINE_SIM;
+    static final int JACCARD_SIM = SimMetric.JACCARD_SIM;
+    static final int PSEUDO_CODE_SIM = SimMetric.PSEUDO_CODE_SIM;
     
     public MMR()
     {
@@ -57,40 +54,40 @@ public class MMR {
         sim2 = new CosineSim(); 
         
         switch(sim1Type) {
-            case 1: 
-                sim1 = new CosineSim();
+            case COSINE_SIM: sim1 = new CosineSim(); 
                 break;
-            case 2:
-                
+            case GRAPH_SIM: 
                 break;
-            case 3:
-                
+            case JACCARD_SIM: sim1 = new JaccardSim();
+                break;
+            case PSEUDO_CODE_SIM: 
                 break;
         }
+        
         switch(sim2Type) {
-            case 1: 
-                sim2 = new CosineSim();
+            case COSINE_SIM: sim2 = new CosineSim(); 
                 break;
-            case 2:
-                
+            case GRAPH_SIM: 
                 break;
-            case 3:
-                
+            case JACCARD_SIM: sim2 = new JaccardSim();
+                break;
+            case PSEUDO_CODE_SIM: 
                 break;
         }
     }
     
-    public List<List<String>> rankedList(List<List<String>> sentenceList, List<String> query, double lambda, int maxResults)
+    public List<List<String>> rankedList(List<List<String>> documentList, List<String> query, double lambda, int maxResults)
     {
         TreeSet<Document_Score> sList = new TreeSet<>(new Comparator<Document_Score>() {
 
             @Override
             public int compare(Document_Score o1, Document_Score o2) {
+                if(o1.getScore() == o2.getScore()) return 1;
                 return -Double.compare(o1.getScore(), o2.getScore());
             }
         });
         
-        ArrayList<List<String>> r_sList = new ArrayList<>(sentenceList);
+        ArrayList<List<String>> r_sList = new ArrayList<>(documentList);
         
         while(!r_sList.isEmpty())
         {
@@ -115,7 +112,7 @@ public class MMR {
         double maxScore = 0;
         for(List<String> document : unselectedDocuments)
         {
-            double score = lambda * (sim1.sentenceRank(document, query) - ((1 - lambda) * maxSim2(document, selectedDocuments)));
+            double score = lambda * (sim1.documentRank(document, query) - ((1 - lambda) * maxSim2(document, selectedDocuments)));
             if(score > maxScore) 
             {
                 maxScore = score;
@@ -131,54 +128,71 @@ public class MMR {
         Iterator<Document_Score> it = selectedDocuments.iterator();
         while(it.hasNext())
         {
-            List<String> document = it.next().getDocument();
-            double score = sim2.sentenceRank(unselectedDocument, document);
+            double score = sim2.documentRank(unselectedDocument, it.next().getDocument());
             if(score > maxScore) maxScore = score;
         }
         return maxScore;
     }
     
     public static void main(String[] args) {
+        ArrayList<String> document1 = new ArrayList<>();
+        document1.add("one");
+        document1.add("two");
+        document1.add("three");
+        document1.add("four");
+        document1.add("five");
+        document1.add("six");
+        document1.add("seven");
+        document1.add("eight");
+        document1.add("nine");
+        document1.add("ten");
+        ArrayList<String> document2 = new ArrayList<>();
+        document2.add("three");
+        document2.add("four");
+        document2.add("five");
+        document2.add("six");
+        document2.add("seven");
+        ArrayList<String> document3 = new ArrayList<>();
+        document3.add("eight");
+        document3.add("nine");
+        document3.add("ten");
+        document3.add("eleven");
+        document3.add("twelve");
+        ArrayList<String> document4 = new ArrayList<>();
+        document4.add("thirteen");
+        document4.add("fourteen");
+        document4.add("fifteen");
+        document4.add("sixteen");
+        document4.add("seventeen");
+        ArrayList<String> document5 = new ArrayList<>();
+        document5.add("eight");
+        document5.add("nine");
+        document5.add("ten");
+        document5.add("eleven");
+        document5.add("twelve");
+        document5.add("thirteen");
+        document5.add("fourteen");
+        document5.add("fifteen");
+        document5.add("sixteen");
+        document5.add("seventeen");
+        ArrayList<List<String>> documents = new ArrayList<>();
+        documents.add(document1);
+        documents.add(document2);
+        documents.add(document3);
+        documents.add(document4);
+        documents.add(document5);
+        ArrayList<String> query = new ArrayList<>();
+        query.add("thirteen");
+        query.add("fourteen");
+        query.add("fifteen");
+        query.add("sixteen");
+        query.add("seventeen");
         
-//        TreeSet<Document_Score> selectedDocuments = new TreeSet<>(new Comparator<Document_Score>() {
-//
-//            @Override
-//            public int compare(Document_Score o1, Document_Score o2) {
-//                return -Double.compare(o1.getScore(), o2.getScore());
-//            }
-//        });
-//        
-//        ArrayList<String> one = new ArrayList<>();
-//        one.add("one");
-//        ArrayList<String> two = new ArrayList<>();
-//        one.add("two");
-//        ArrayList<String> three = new ArrayList<>();
-//        one.add("three");
-//        ArrayList<String> four = new ArrayList<>();
-//        one.add("four");
-//        
-//        selectedDocuments.add(new Document_Score(one, .2));
-//        selectedDocuments.add(new Document_Score(one, .4));
-//        selectedDocuments.add(new Document_Score(one, .3));
-//        selectedDocuments.add(new Document_Score(one, .1));
-//        Iterator<Document_Score> it = selectedDocuments.iterator();
-//        while(it.hasNext())
-//        {
-//            Document_Score ds = it.next();
-//            System.out.println(ds.getScore());
-//        }
-        
-//        HashMap<String, Double> testMap = new HashMap<>();
-//        testMap.put("test2", .2);
-//        testMap.put("test6", .6);
-//        testMap.put("test4", .4);
-//        testMap.put("test3", .3);
-//        testMap.put("test5", .5);
-//        testMap.put("test1", .1);
-//        testMap = (HashMap<String, Double>) sortByValue2(testMap);
-//        for(Map.Entry<String, Double> entry : testMap.entrySet())
-//        {
-//            System.out.println(entry.getKey());
-//        }
+        MMR mmr = new MMR();
+        for(List<String> results : mmr.rankedList(documents, query, 0.7, 5))
+        {
+            for(String word : results) System.out.print(word + " ");
+            System.out.println("");
+        }
     }
 }
