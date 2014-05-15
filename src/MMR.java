@@ -51,8 +51,8 @@ public class MMR {
     
     public MMR()
     {
-        sim1 = new CosineSim();
-        sim2 = new CosineSim(); 
+        sim1 = new JaccardSim();
+        sim2 = new JaccardSim(); 
     }
     
     public MMR(int sim1Type, int sim2Type)
@@ -175,65 +175,40 @@ public class MMR {
     
     public static void main(String[] args) {
         
-// Current Test Case is not a very good one
-        
-        ArrayList<String> document1 = new ArrayList<>();
-        document1.add("one");
-        document1.add("two");
-        document1.add("three");
-        document1.add("four");
-        document1.add("five");
-        document1.add("six");
-        document1.add("seven");
-        document1.add("eight");
-        document1.add("nine");
-        document1.add("ten");
-        ArrayList<String> document2 = new ArrayList<>();
-        document2.add("three");
-        document2.add("four");
-        document2.add("five");
-        document2.add("six");
-        document2.add("seven");
-        ArrayList<String> document3 = new ArrayList<>();
-        document3.add("eight");
-        document3.add("nine");
-        document3.add("ten");
-        document3.add("eleven");
-        document3.add("twelve");
-        ArrayList<String> document4 = new ArrayList<>();
-        document4.add("thirteen");
-        document4.add("fourteen");
-        document4.add("fifteen");
-        document4.add("sixteen");
-        document4.add("seventeen");
-        ArrayList<String> document5 = new ArrayList<>();
-        document5.add("eight");
-        document5.add("nine");
-        document5.add("ten");
-        document5.add("eleven");
-        document5.add("twelve");
-        document5.add("thirteen");
-        document5.add("fourteen");
-        document5.add("fifteen");
-        document5.add("sixteen");
-        document5.add("seventeen");
-        ArrayList<List<String>> documents = new ArrayList<>();
-        documents.add(document1);
-        documents.add(document2);
-        documents.add(document3);
-        documents.add(document4);
-        documents.add(document5);
+        List<List<String>> documents = new ArrayList<>();
         ArrayList<String> query = new ArrayList<>();
-        query.add("thirteen");
-        query.add("fourteen");
-        query.add("fifteen");
-        query.add("sixteen");
-        query.add("seventeen");
         
-        MMR mmr = new MMR();
-        for(List<String> results : mmr.rankedList(documents, query, 0.7, 5))
+        String documentText[] = { "abcdxyz" , "abcdefg", "hijklmn", "opqrstu", "vwxyz"};
+        String queryText = "abcdxyzhio";
+        
+        for (int i = 0; i < documentText.length; i++) {
+            ArrayList<String> document = new ArrayList<>();
+            for(int j = 0; j < documentText[i].length(); j++){
+                document.add(documentText[i].charAt(j) + "");
+            }
+            documents.add(document);
+        }
+        
+        for(int i = 0; i < queryText.length(); i++) query.add(queryText.charAt(i) + "");
+        
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////        
+//                                             Change This Lambda Value to Test Algorithm                                     //
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        
+        double lambda = 1;
+        
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////        
+//                                             Change This Lambda Value to Test Algorithm                                     //
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////        
+        
+        List<List<String>> ret = new MMR().rankedList(documents, query, lambda, 5);
+        
+        for(List<String> retSent : ret)
         {
-            for(String word : results) System.out.print(word + " ");
+            for(String word : retSent) 
+            {
+                System.out.print(word + "\t");
+            }
             System.out.println("");
         }
     }
