@@ -174,7 +174,7 @@ public class MMR {
     }
     
     public static void main(String[] args) {
-        
+              
         List<List<String>> documents = new ArrayList<>();
         ArrayList<String> query = new ArrayList<>();
         
