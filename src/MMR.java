@@ -174,7 +174,10 @@ public class MMR {
     }
     
     public static void main(String[] args) {
-              
+        
+// Current Test Case is not a very good one
+        
+        
         List<List<String>> documents = new ArrayList<>();
         ArrayList<String> query = new ArrayList<>();
         
@@ -211,5 +214,14 @@ public class MMR {
             }
             System.out.println("");
         }
+        
+//        for(ArrayList<String> document : documents)
+//        {
+//            for(String word : document) System.out.print(word + " ");
+//            System.out.print("\t");
+//            for(String word : query) System.out.print(word + " ");
+//            System.out.print(" : \t");
+//            System.out.println(new CosineSim().documentRank(document, query));
+//        }
     }
 }
