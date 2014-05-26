@@ -6,6 +6,8 @@
 
 package Matrix;
 
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 
 /**
@@ -14,19 +16,35 @@ import java.util.List;
  */
 public class IDFMatrix {
     
-    public IDFMatrix(List<String> document1, List<String> document2)
+    HashMap<String, Integer> vectAtt;
+    final int N;
+    
+    public IDFMatrix(List<List<String>> document)
     {
+        N = document.size();
+        vectAtt = new HashMap<>();
+        for(List<String> sentence : document)
+        {
+            HashSet<String> indexedSentence = new HashSet<>();
+            for(String word : sentence)
+            {
+                if(vectAtt.containsKey(word))
+                {
+                    if(!indexedSentence.contains(word))
+                    {
+                        vectAtt.put(word, vectAtt.get(word) + 1);
+                        indexedSentence.add(word);
+                    }
+                }
+                else vectAtt.put(word, 1);
+            }
+        }
+    }
 
-    }
-    public int matrixLength() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    public int getFreqA(int index) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-    public int getFreqB(int index) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public double getIDF(String words) {
+        Integer count = vectAtt.get(words);
+        if(count == null) count = 0;
+        return Math.log((N + 1)/(0.5 + count));
     }
 
     

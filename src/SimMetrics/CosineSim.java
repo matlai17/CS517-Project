@@ -2,6 +2,7 @@ package SimMetrics;
 
 
 import Matrix.FrequencyMatrix;
+import Matrix.IDFMatrix;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -20,18 +21,52 @@ public class CosineSim implements SimMetric {
         if(document.isEmpty() && !query.isEmpty()) return 0;
         if(query.isEmpty() && !document.isEmpty()) return 0;
         
-        FrequencyMatrix fM = new FrequencyMatrix(document, query);
+        FrequencyMatrix documentFrequencyMatrix = new FrequencyMatrix(document);
+        FrequencyMatrix queryFrequencyMatrix = new FrequencyMatrix(query);
         double denominator;
         int numerator = 0;
         int aMagnitudeTotal = 0;
         int bMagnitudeTotal = 0;
         
-        for(int i = 0; i < fM.matrixLength(); i++)
+        for(String word : document)
         {
-            numerator += fM.getFreqA(i) * fM.getFreqB(i);
-            aMagnitudeTotal += Math.pow(fM.getFreqA(i), 2);
-            bMagnitudeTotal += Math.pow(fM.getFreqB(i), 2);
+            numerator += documentFrequencyMatrix.getFreq(word) * queryFrequencyMatrix.getFreq(word);
+            aMagnitudeTotal += Math.pow(documentFrequencyMatrix.getFreq(word), 2);
         }
+        for(String word : query)
+            bMagnitudeTotal += Math.pow(queryFrequencyMatrix.getFreq(word), 2);
+        
+        denominator = Math.sqrt(aMagnitudeTotal) * Math.sqrt(bMagnitudeTotal);
+        
+        double sim = (double)numerator / denominator;
+        return sim;
+    }
+    
+    public static double documentSimilarity(List<String> document, List<String> query) {
+        return new CosineSim().documentRank(document, query);
+    }
+    
+    public static double documentRankIDFWeighted(List<String> document, List<String> query, IDFMatrix iDF) {
+        
+        if(document.isEmpty() && query.isEmpty()) return 1;
+        if(document.isEmpty() && !query.isEmpty()) return 0;
+        if(query.isEmpty() && !document.isEmpty()) return 0;
+        
+        FrequencyMatrix documentFrequencyMatrix = new FrequencyMatrix(document);
+        FrequencyMatrix queryFrequencyMatrix = new FrequencyMatrix(query);
+        
+        double denominator;
+        int numerator = 0;
+        int aMagnitudeTotal = 0;
+        int bMagnitudeTotal = 0;
+        
+        for(String word : document)
+        {
+            numerator += documentFrequencyMatrix.getFreq(word) * queryFrequencyMatrix.getFreq(word) * Math.pow(iDF.getIDF(word),2);
+            aMagnitudeTotal += Math.pow(documentFrequencyMatrix.getFreq(word) * iDF.getIDF(word), 2);
+        }
+        for(String word : query)
+            bMagnitudeTotal += Math.pow(queryFrequencyMatrix.getFreq(word) * iDF.getIDF(word), 2);
         
         denominator = Math.sqrt(aMagnitudeTotal) * Math.sqrt(bMagnitudeTotal);
         

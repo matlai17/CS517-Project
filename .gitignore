@@ -1,1 +1,5 @@
 /build/
+/Parser/build/
+/Parser/nbproject/private/
+/src/Parser/build/
+/src/Parser/nbproject/private/

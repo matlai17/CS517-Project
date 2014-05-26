@@ -64,9 +64,9 @@ public class MMR {
         switch(sim1Type) {
             case COSINE_SIM: sim1 = new CosineSim(); 
                 break;
-            case LEXRANK_SIM: throw new Error("Must use other constructer with initilizer object array. "
+            case LEXRANK_SIM: throw new Error("Must use constructer with an object array. "
                     + "Index 0 must contain a List<List<String>> of the document and "
-                    + "Index 1 must contain the Cosine Similarity Threshold with value between 0 and 1.");    
+                    + "Index 1 must contain the Cosine Similarity Threshold with value between 0 and 1.");
             case JACCARD_SIM: sim1 = new JaccardSim();
                 break;
             case PSEUDO_CODE_SIM: 
@@ -76,7 +76,7 @@ public class MMR {
         switch(sim2Type) {
             case COSINE_SIM: sim2 = new CosineSim(); 
                 break;
-            case LEXRANK_SIM: throw new Error("Must use other constructer with initilizer object array. "
+            case LEXRANK_SIM: throw new Error("Must use constructer with an object array. "
                     + "Index 0 must contain a List<List<String>> of the document and "
                     + "Index 1 must contain the Cosine Similarity Threshold with value between 0 and 1.");
             case JACCARD_SIM: sim2 = new JaccardSim();
@@ -99,7 +99,7 @@ public class MMR {
                         && (((List)initializers[0]).get(0) instanceof List) 
                         && ((((List)((List)initializers[0]).get(0)).get(0)) instanceof String)) 
                         || !(initializers[1] instanceof Double))
-                    throw new Error("Must use other constructer with initilizer object array. "
+                    throw new Error("Must use constructer with an object array. "
                     + "Index 0 must contain a List<List<String>> of the document and "
                     + "Index 1 must contain the Cosine Similarity Threshold with value between 0 and 1.");
                 sim1 = new LexRankSim((List<List<String>>) initializers[0], (Double)initializers[1]);
@@ -118,7 +118,7 @@ public class MMR {
                         && (((List)initializers[0]).get(0) instanceof List) 
                         && ((((List)((List)initializers[0]).get(0)).get(0)) instanceof String)) 
                         || !(initializers[1] instanceof Double))
-                    throw new Error("Must use other constructer with initilizer object array. "
+                    throw new Error("Must use constructer with an object array. "
                     + "Index 0 must contain a List<List<String>> of the document and "
                     + "Index 1 must contain the Cosine Similarity Threshold with value between 0 and 1.");
                 sim1 = new LexRankSim((List<List<String>>) initializers[0], (Double)initializers[1]);

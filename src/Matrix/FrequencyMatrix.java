@@ -7,7 +7,7 @@
 package Matrix;
 
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -16,23 +16,21 @@ import java.util.List;
  */
 public class FrequencyMatrix {
     
-    ArrayList<String> vectAtt;
-    int[][] matrix;
+    HashMap<String, Integer> vectAtt;
 
-    public FrequencyMatrix(List<String> document1, List<String> document2)
+    public FrequencyMatrix(List<String> document)
     {
-        HashSet<String> setOfVectorAttributes = new HashSet<>();
-        for(String s : document1) setOfVectorAttributes.add(s); 
-        for(String s : document2) setOfVectorAttributes.add(s); 
-
-        vectAtt = new ArrayList<>(setOfVectorAttributes);
-        matrix = new int[vectAtt.size()][2];
-
-        for(String s : document1) matrix[vectAtt.indexOf(s)][0]++;
-        for(String s : document2) matrix[vectAtt.indexOf(s)][1]++;
+        vectAtt = new HashMap<>();
+        for(String word : document)
+            if(vectAtt.containsKey(word)) vectAtt.put(word, vectAtt.get(word)+1);
+            else vectAtt.put(word, 1);
+        
     }
 
     public int matrixLength() { return vectAtt.size(); }
-    public int getFreqA(int index) { return matrix[index][0]; }
-    public int getFreqB(int index) { return matrix[index][1]; }
+    public int getFreq(String word) {
+        Integer count = vectAtt.get(word);
+        if(count == null) return 0;
+        return count;
+    }
 }
