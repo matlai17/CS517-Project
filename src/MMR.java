@@ -1,7 +1,8 @@
 
+import SimMetrics.JaccardSim;
 import SimMetrics.CosineSim;
+import SimMetrics.LexRankSim;
 import SimMetrics.SimMetric;
-
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -44,7 +45,7 @@ public class MMR {
     
     SimMetric sim1;
     SimMetric sim2;
-    static final int GRAPH_SIM = SimMetric.GRAPH_SIM;
+    static final int LEXRANK_SIM = SimMetric.GRAPH_SIM;
     static final int COSINE_SIM = SimMetric.COSINE_SIM;
     static final int JACCARD_SIM = SimMetric.JACCARD_SIM;
     static final int PSEUDO_CODE_SIM = SimMetric.PSEUDO_CODE_SIM;
@@ -63,7 +64,45 @@ public class MMR {
         switch(sim1Type) {
             case COSINE_SIM: sim1 = new CosineSim(); 
                 break;
-            case GRAPH_SIM: 
+            case LEXRANK_SIM: throw new Error("Must use other constructer with initilizer object array. "
+                    + "Index 0 must contain a List<List<String>> of the document and "
+                    + "Index 1 must contain the Cosine Similarity Threshold with value between 0 and 1.");    
+            case JACCARD_SIM: sim1 = new JaccardSim();
+                break;
+            case PSEUDO_CODE_SIM: 
+                break;
+        }
+        
+        switch(sim2Type) {
+            case COSINE_SIM: sim2 = new CosineSim(); 
+                break;
+            case LEXRANK_SIM: throw new Error("Must use other constructer with initilizer object array. "
+                    + "Index 0 must contain a List<List<String>> of the document and "
+                    + "Index 1 must contain the Cosine Similarity Threshold with value between 0 and 1.");
+            case JACCARD_SIM: sim2 = new JaccardSim();
+                break;
+            case PSEUDO_CODE_SIM: 
+                break;
+        }
+    }
+    
+    public MMR(int sim1Type, int sim2Type, Object[] initializers)
+    {
+        sim1 = new CosineSim();
+        sim2 = new CosineSim(); 
+        
+        switch(sim1Type) {
+            case COSINE_SIM: sim1 = new CosineSim(); 
+                break;
+            case LEXRANK_SIM: 
+                if(initializers.length != 2 || !((initializers[0] instanceof List) 
+                        && (((List)initializers[0]).get(0) instanceof List) 
+                        && ((((List)((List)initializers[0]).get(0)).get(0)) instanceof String)) 
+                        || !(initializers[1] instanceof Double))
+                    throw new Error("Must use other constructer with initilizer object array. "
+                    + "Index 0 must contain a List<List<String>> of the document and "
+                    + "Index 1 must contain the Cosine Similarity Threshold with value between 0 and 1.");
+                sim1 = new LexRankSim((List<List<String>>) initializers[0], (Double)initializers[1]);
                 break;
             case JACCARD_SIM: sim1 = new JaccardSim();
                 break;
@@ -74,7 +113,15 @@ public class MMR {
         switch(sim2Type) {
             case COSINE_SIM: sim2 = new CosineSim(); 
                 break;
-            case GRAPH_SIM: 
+            case LEXRANK_SIM: 
+                if(initializers.length != 2 || !((initializers[0] instanceof List) 
+                        && (((List)initializers[0]).get(0) instanceof List) 
+                        && ((((List)((List)initializers[0]).get(0)).get(0)) instanceof String)) 
+                        || !(initializers[1] instanceof Double))
+                    throw new Error("Must use other constructer with initilizer object array. "
+                    + "Index 0 must contain a List<List<String>> of the document and "
+                    + "Index 1 must contain the Cosine Similarity Threshold with value between 0 and 1.");
+                sim1 = new LexRankSim((List<List<String>>) initializers[0], (Double)initializers[1]);
                 break;
             case JACCARD_SIM: sim2 = new JaccardSim();
                 break;
