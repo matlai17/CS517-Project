@@ -15,7 +15,7 @@ public interface SimMetric {
     /**
      * The integer representation of a certain Graphical Similarity Metric.
      */
-    static final int GRAPH_SIM = 1;
+    static final int LEXRANK_SIM = 1;
     /**
      * The integer representation of the Cosine Similarity Metric.
      */
@@ -28,6 +28,10 @@ public interface SimMetric {
      * The integer representation of a certain Pseudo-Code Similarity Metric.
      */
     static final int PSEUDO_CODE_SIM = 4;
+    /**
+     * The integer representation of a certain Pseudo-Code Similarity Metric.
+     */
+    static final int COSINE_IDF_SIM = 5;
     
     /**
      * Returns the ranking of the sentence given the implemented similarity 

@@ -12,6 +12,9 @@ import edu.uci.ics.jung.graph.UndirectedSparseMultigraph;
 import java.util.Collection;
 import java.util.List;
 import java.util.SortedMap;
+import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  *
@@ -27,11 +30,21 @@ public class LexRankSim implements SimMetric {
         graph = new UndirectedSparseMultigraph<>();
         for(List<String> document : documents)
         {
-            for( List<String> vertex : graph.getVertices() )
+//            Collection<List<String>> asdf = graph.getVertices();
+            CopyOnWriteArrayList<List<String>> cOWAL = new CopyOnWriteArrayList<>(graph.getVertices());
+            java.util.Iterator<List<String>> it = cOWAL.iterator();
+            while(it.hasNext())
             {
+                List<String> vertex = it.next();
                 double similarity = CosineSim.documentSimilarity(document, vertex);
-                if(similarity > simThreshold) graph.addEdge(similarity, document, vertex);
+                if(similarity > simThreshold) 
+                    try
+                    {
+                        graph.addEdge(similarity, vertex, document);
+                    } catch(IllegalArgumentException e){}
+                
             }
+            if(!graph.containsVertex(document)) graph.addVertex(document);
         }
         iDF = new IDFMatrix(documents);
     }
@@ -46,6 +59,7 @@ public class LexRankSim implements SimMetric {
                 double similarity = CosineSim.documentSimilarity(document, vertex);
                 if(similarity > simThreshold) graph.addEdge(similarity, document, vertex);
             }
+            if(!graph.containsVertex(document)) graph.addVertex(document);
         }
         this.iDF = iDF;
     }
@@ -54,6 +68,8 @@ public class LexRankSim implements SimMetric {
     {
         return iDF;
     }
+    
+    public int retSize() { return graph.getVertexCount(); }
     
     private double relavence(List<String> document, List<String> query)
     {
@@ -82,4 +98,7 @@ public class LexRankSim implements SimMetric {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     
+//    public SortedMap<List<String>, Double> orderedDocuments(List<List<String>> documentList, List<String> query, int resultAmount) {
+//        
+//    }
 }

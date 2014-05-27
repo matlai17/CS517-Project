@@ -39,8 +39,7 @@ public class Parser {
 //            System.out.println(line);
 //            line = line.replaceAll("[^\\n\\w. ]", "");
 //            String [] sentTokens = line.split("(?=.*?\\w{3,})(\\. |\\.$)");
-            String [] sentTokens = line.split("(?<=\\w[\\w\\)\\]\"](?<!Mrs?|Dr|Rev|Mr|Ms|vs|abd|ABD|Abd|resp|St|wt)[\\.\\?\\!\\:\\@]\\s)");
-            for(String sentence : sentTokens)
+            for(String sentence : line.split("(?<=\\w[\\w\\)\\]\"](?<!Mrs?|Dr|Rev|Mr|Ms|vs|abd|ABD|Abd|resp|St|wt)[\\.\\?\\!\\:\\@]\\s)"))
             {
                 if(sentence.length() < 1) continue;
                 if(sentence.charAt(0) == ' ') sentence = sentence.substring(1);
@@ -48,6 +47,7 @@ public class Parser {
                 ArrayList<String> stemmedSentVect = new ArrayList<String>();
                 for(String word : sentence.replaceAll("[^\\w ]", "").split("\\s")) 
                 {
+                    if(word.replaceAll("\\s\n", "").length() < 1) continue;
                     word = word.replaceAll("[^\\w]", "");
                     sentVect.add(word);
                     stemmedSentVect.add(Stemmer.stemWord(word));
@@ -56,6 +56,22 @@ public class Parser {
                 stemMap.put(stemmedSentVect, sentence);
             }
         }
+    }
+    
+    public static List<String> vectorAndStem(String sentence)
+    {
+        
+        ArrayList<String> sentVect = new ArrayList<String>();
+        ArrayList<String> stemmedSentVect = new ArrayList<String>();
+        for(String word : sentence.replaceAll("[^\\w ]", "").split("\\s")) 
+        {
+            word = word.replaceAll("[^\\w]", "");
+            sentVect.add(word);
+            stemmedSentVect.add(Stemmer.stemWord(word));
+        }
+        
+        
+        return stemmedSentVect;
     }
     
     public List<List<String>> getStemmedDocument()

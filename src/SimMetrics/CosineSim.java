@@ -14,9 +14,22 @@ import java.util.SortedMap;
  */
 public class CosineSim implements SimMetric {
     
+    IDFMatrix iDFMatrix;
+    
+    public CosineSim()
+    {
+        iDFMatrix = null;
+    }
+    
+    public CosineSim(IDFMatrix iDFM)
+    {
+        iDFMatrix = iDFM;
+    }
+    
     @Override
     public double documentRank(List<String> document, List<String> query) {
         
+        if(iDFMatrix != null) return documentRankIDFWeighted(document, query, iDFMatrix);
         if(document.isEmpty() && query.isEmpty()) return 1;
         if(document.isEmpty() && !query.isEmpty()) return 0;
         if(query.isEmpty() && !document.isEmpty()) return 0;
@@ -82,28 +95,36 @@ public class CosineSim implements SimMetric {
     public static void main(String[] args) {
         ArrayList<ArrayList<String>> documents = new ArrayList<>();
         ArrayList<String> query = new ArrayList<>();
+        ArrayList<String> document = new ArrayList<>();
         
-        String documentText[] = { "abcdef" , "wxyz" };
-        String queryText = "abcdzyx";
+        String documentA[] = {"Divis", "of", "Univers", "Advancement"};
+        String queryA[] = {"Office", "of", "Public", "Affair", "New", "Releas" };
         
-        for (int i = 0; i < documentText.length; i++) {
-            ArrayList<String> document = new ArrayList<>();
-            for(int j = 0; j < documentText[i].length(); j++){
-                document.add(documentText[i].charAt(j) + "");
-            }
-            documents.add(document);
-        }
+        for(String s : documentA) document.add(s);
+        for(String s : queryA) query.add(s);
         
-        for(int i = 0; i < queryText.length(); i++) query.add(queryText.charAt(i) + "");
+        System.out.println(new CosineSim().documentRank(document, query));
+//        String documentText[] = { "abcdef" , "wxyz" };
+//        String queryText = "abcdzyx";
         
-        for(ArrayList<String> document : documents)
-        {
-            for(String word : document) System.out.print(word + " ");
-            System.out.print("\t");
-            for(String word : query) System.out.print(word + " ");
-            System.out.print(" : \t");
-            System.out.println(new CosineSim().documentRank(document, query));
-        }
+//        for (int i = 0; i < documentText.length; i++) {
+//            ArrayList<String> document = new ArrayList<>();
+//            for(int j = 0; j < documentText[i].length(); j++){
+//                document.add(documentText[i].charAt(j) + "");
+//            }
+//            documents.add(document);
+//        }
+//        
+//        for(int i = 0; i < queryText.length(); i++) query.add(queryText.charAt(i) + "");
+        
+//        for(ArrayList<String> document : documents)
+//        {
+//            for(String word : document) System.out.print(word + " ");
+//            System.out.print("\t");
+//            for(String word : query) System.out.print(word + " ");
+//            System.out.print(" : \t");
+//            System.out.println(new CosineSim().documentRank(document, query));
+//        }
     }
     
 }
