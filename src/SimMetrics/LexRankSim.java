@@ -24,7 +24,9 @@ public class LexRankSim implements SimMetric {
     
     UndirectedSparseMultigraph<List<String>, Double> graph;
     IDFMatrix iDF;
-    FrequencyMatrix tf;
+    HashMap<List<String>, Double> mapOfSummationOfQueryRelevanceWithDocumentCluster;
+    HashMap<List<String>, Double> mapOfSummationOfDocumentClusterSimilarity;
+    
     public LexRankSim(List<List<String>> documents, double simThreshold)
     {
         graph = new UndirectedSparseMultigraph<>();
@@ -69,7 +71,7 @@ public class LexRankSim implements SimMetric {
         return iDF;
     }
     
-    public int retSize() { return graph.getVertexCount(); }
+    public int getGraphSize() { return graph.getVertexCount(); }
     
     private double relavence(List<String> document, List<String> query)
     {
@@ -83,9 +85,37 @@ public class LexRankSim implements SimMetric {
         return score;
     }
     
+    private double sim(List<String> document, List<String> query)
+    {
+        return new CosineSim(iDF).documentRank(document, query);
+    }
+    
     public double documentRank(List<String> document, List<String> query, double queryBias)
     {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        double rel = relavence(document, query);
+        Double sQRel = mapOfSummationOfQueryRelevanceWithDocumentCluster.get(query);
+        if(sQRel == null)
+        {
+            sQRel = 0.0;
+            for(List<String> vertex : graph.getVertices()) sQRel += relavence(vertex, query);
+            mapOfSummationOfQueryRelevanceWithDocumentCluster.put(query, sQRel);
+        }
+        
+        Double sDSim = mapOfSummationOfDocumentClusterSimilarity.get(document);
+        if(sDSim == null)
+        {
+            sDSim = 0.0;
+            Collection<List<String>> neighbors = graph.getNeighbors(document);
+            
+            for(List<String> vertex : neighbors)
+            {
+                
+            }
+            
+            mapOfSummationOfDocumentClusterSimilarity.put(document, sDSim);        
+        }
+        
+        return queryBias * (rel / sQRel) + (1 - queryBias) ;
     }
 
     @Override

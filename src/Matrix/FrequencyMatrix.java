@@ -28,6 +28,7 @@ public class FrequencyMatrix {
     }
 
     public int matrixLength() { return vectAtt.size(); }
+    
     public int getFreq(String word) {
         Integer count = vectAtt.get(word);
         if(count == null) return 0;
