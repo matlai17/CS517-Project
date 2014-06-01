@@ -43,7 +43,7 @@ public interface SimMetric {
      * @return The ranking of the sentence based on implemented algorithm
      * 
      */
-    public double documentRank(List<String> document, List<String> query);
+    public Double documentRank(List<String> document, List<String> query);
     
     /**
      * Returns a map of sentences and their rankings, sorted by the ranking

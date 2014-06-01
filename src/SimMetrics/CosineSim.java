@@ -27,12 +27,12 @@ public class CosineSim implements SimMetric {
     }
     
     @Override
-    public double documentRank(List<String> document, List<String> query) {
+    public Double documentRank(List<String> document, List<String> query) {
         
         if(iDFMatrix != null) return documentRankIDFWeighted(document, query, iDFMatrix);
-        if(document.isEmpty() && query.isEmpty()) return 1;
-        if(document.isEmpty() && !query.isEmpty()) return 0;
-        if(query.isEmpty() && !document.isEmpty()) return 0;
+        if(document.isEmpty() && query.isEmpty()) return 1.0;
+        if(document.isEmpty() && !query.isEmpty()) return 0.0;
+        if(query.isEmpty() && !document.isEmpty()) return 0.0;
         
         FrequencyMatrix documentFrequencyMatrix = new FrequencyMatrix(document);
         FrequencyMatrix queryFrequencyMatrix = new FrequencyMatrix(query);

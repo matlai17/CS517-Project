@@ -22,8 +22,11 @@ public class FrequencyMatrix {
     {
         vectAtt = new HashMap<>();
         for(String word : document)
+        {
+            word = word.toLowerCase();
             if(vectAtt.containsKey(word)) vectAtt.put(word, vectAtt.get(word)+1);
             else vectAtt.put(word, 1);
+        }
         
     }
 
