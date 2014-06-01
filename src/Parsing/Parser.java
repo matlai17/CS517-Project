@@ -34,8 +34,17 @@ public class Parser {
 //        Scanner io = new Scanner(f);
         BufferedReader io = new BufferedReader(new FileReader(f));
         String line;
+        boolean markUpFile = false, captureText = false;
         while((line = io.readLine()) != null)
         {
+            if(line.startsWith("<DOC>")) markUpFile = true;
+            if(markUpFile && line.startsWith("<TEXT>"))
+            {
+                captureText = true;
+                continue;
+            }
+            if(markUpFile && line.startsWith("</TEXT>")) captureText = false;
+            if(!captureText) continue;
             document += line + " ";
 //            String line = io.nextLine();
 //            System.out.println(line);
