@@ -2,6 +2,8 @@
 import MMR.MMR;
 import Matrix.IDFMatrix;
 import Parsing.Parser;
+import SimMetrics.CosineSim;
+import SimMetrics.JaccardSim;
 import SimMetrics.LexRankSim;
 import SimMetrics.SimMetric;
 import java.io.File;
@@ -31,7 +33,9 @@ public class Main {
 //        Thread.sleep(10000);
         System.out.println("REACHED2");
         
-        MMR mmr = new MMR(SimMetric.COSINE_IDF_SIM, SimMetric.JACCARD_SIM, new Object[]{new IDFMatrix(p.getStemmedDocument())});
+//        MMR mmr = new MMR(SimMetric.COSINE_IDF_SIM, SimMetric.JACCARD_SIM, new Object[]{new IDFMatrix(p.getStemmedDocument())});
+        IDFMatrix idf = new IDFMatrix(p.getStemmedDocument());
+        MMR mmr = new MMR(new CosineSim(idf), new JaccardSim());
         
         long time = System.currentTimeMillis();
         List<List<String>> results = mmr.rankedList(p.getStemmedDocument(), Parser.vectorAndStem(query), .8, 10);

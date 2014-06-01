@@ -224,103 +224,13 @@ public class MMR {
         sim2 = new JaccardSim();
     }
     
-    public MMR(int sim1Type, int sim2Type)
+    public MMR(SimMetric sim1, SimMetric sim2)
     {
-        this.sim1Type = sim1Type;
-        this.sim2Type = sim2Type;
-        scores = new ConcurrentHashMap<>();
-        sim1 = new CosineSim();
-        sim2 = new CosineSim();
-        
-        switch(sim1Type) {
-            case COSINE_SIM: sim1 = new CosineSim();
-            break;
-            case LEXRANK_SIM: throw new Error("Must use constructer with an object array. "
-                    + "Index 0 must contain a List<List<String>> of the document and "
-                    + "Index 1 must contain the Cosine Similarity Threshold with value between 0 and 1.");
-            case JACCARD_SIM: sim1 = new JaccardSim();
-            break;
-            case PSEUDO_CODE_SIM:
-                break;
-            case COSINE_IDF_SIM: throw new Error("Must use constructer with an object array. "
-                    + "Index 0 must contain an IDFMatrix.");
-        }
-        
-        switch(sim2Type) {
-            case COSINE_SIM: sim2 = new CosineSim();
-            break;
-            case LEXRANK_SIM: throw new Error("Must use constructer with an object array. "
-                    + "Index 0 must contain a List<List<String>> of the document and "
-                    + "Index 1 must contain the Cosine Similarity Threshold with value between 0 and 1.");
-            case JACCARD_SIM: sim2 = new JaccardSim();
-            break;
-            case PSEUDO_CODE_SIM:
-                break;
-            case COSINE_IDF_SIM: throw new Error("Must use constructer with an object array. "
-                    + "Index 0 must contain an IDFMatrix.");
-                
-        }
+        this.sim1 = sim1;
+        this.sim2 = sim2;
+        scores = new ConcurrentHashMap<DoubleDoc, Double>();
     }
-    
-    public MMR(int sim1Type, int sim2Type, Object[] initializers)
-    {
-        this.sim1Type = sim1Type;
-        this.sim2Type = sim2Type;
-        scores = new ConcurrentHashMap<>();
-        sim1 = new CosineSim();
-        sim2 = new CosineSim();
-        
-        switch(sim1Type) {
-            case COSINE_SIM: sim1 = new CosineSim();
-            break;
-            case LEXRANK_SIM:
-                if(initializers.length != 2 || !((initializers[0] instanceof List)
-                        && (((List)initializers[0]).get(0) instanceof List)
-                        && ((((List)((List)initializers[0]).get(0)).get(0)) instanceof String))
-                        || !(initializers[1] instanceof Double))
-                    throw new Error("Must use constructer with an object array. "
-                            + "Index 0 must contain a List<List<String>> of the document and "
-                            + "Index 1 must contain the Cosine Similarity Threshold with value between 0 and 1.");
-                sim1 = new LexRankSim((List<List<String>>) initializers[0], (Double)initializers[1]);
-                break;
-            case JACCARD_SIM: sim1 = new JaccardSim();
-            break;
-            case PSEUDO_CODE_SIM:
-                break;
-            case COSINE_IDF_SIM:
-                if(initializers.length != 1 || !(initializers[0] instanceof IDFMatrix))
-                    throw new Error("Must use constructer with an object array. "
-                            + "Index 0 must contain a List<List<String>> of the document and "
-                            + "Index 1 must contain the Cosine Similarity Threshold with value between 0 and 1.");
-                sim1 = new CosineSim((IDFMatrix)initializers[0]);
-                break;
-        }
-        
-        switch(sim2Type) {
-            case COSINE_SIM: sim2 = new CosineSim();
-            break;
-            case LEXRANK_SIM:
-                if(initializers.length != 2 || !((initializers[0] instanceof List)
-                        && (((List)initializers[0]).get(0) instanceof List)
-                        && ((((List)((List)initializers[0]).get(0)).get(0)) instanceof String))
-                        || !(initializers[1] instanceof Double))
-                    throw new Error("Must use constructer with an object array. "
-                            + "Index 0 must contain a List<List<String>> of the document and "
-                            + "Index 1 must contain the Cosine Similarity Threshold with value between 0 and 1.");
-                sim1 = new LexRankSim((List<List<String>>) initializers[0], (Double)initializers[1]);
-                break;
-            case JACCARD_SIM: sim2 = new JaccardSim();
-            break;
-            case PSEUDO_CODE_SIM:
-                break;
-            case COSINE_IDF_SIM: if(initializers.length != 1 || !(initializers[0] instanceof IDFMatrix))
-                throw new Error("Must use constructer with an object array. "
-                        + "Index 0 must contain a List<List<String>> of the document and "
-                        + "Index 1 must contain the Cosine Similarity Threshold with value between 0 and 1.");
-            sim1 = new CosineSim((IDFMatrix)initializers[0]);
-            break;
-        }
-    }
+
 //</editor-fold>
     
     /**
@@ -498,3 +408,108 @@ public class MMR {
 //        }
     }
 }
+
+
+
+
+//<editor-fold defaultstate="collapsed" desc="Deprecated MMR Constructors">
+
+//    public MMR(int sim1Type, int sim2Type)
+//    {
+//        this.sim1Type = sim1Type;
+//        this.sim2Type = sim2Type;
+//        scores = new ConcurrentHashMap<>();
+//        sim1 = new CosineSim();
+//        sim2 = new CosineSim();
+//
+//        switch(sim1Type) {
+//            case COSINE_SIM: sim1 = new CosineSim();
+//            break;
+//            case LEXRANK_SIM: throw new Error("Must use constructer with an object array. "
+//                    + "Index 0 must contain a List<List<String>> of the document and "
+//                    + "Index 1 must contain the Cosine Similarity Threshold with value between 0 and 1."
+//                            + "Index 2 must contain the Query Bias with value between 0 and 1.");
+//            case JACCARD_SIM: sim1 = new JaccardSim();
+//            break;
+//            case PSEUDO_CODE_SIM:
+//                break;
+//            case COSINE_IDF_SIM: throw new Error("Must use constructer with an object array. "
+//                    + "Index 0 must contain an IDFMatrix.");
+//        }
+//
+//        switch(sim2Type) {
+//            case COSINE_SIM: sim2 = new CosineSim();
+//            break;
+//            case LEXRANK_SIM: throw new Error("Must use constructer with an object array. "
+//                    + "Index 0 must contain a List<List<String>> of the document and "
+//                    + "Index 1 must contain the Cosine Similarity Threshold with value between 0 and 1."
+//                            + "Index 2 must contain the Query Bias with value between 0 and 1.");
+//            case JACCARD_SIM: sim2 = new JaccardSim();
+//            break;
+//            case PSEUDO_CODE_SIM:
+//                break;
+//            case COSINE_IDF_SIM: throw new Error("Must use constructer with an object array. "
+//                    + "Index 0 must contain an IDFMatrix.");
+//
+//        }
+//    }
+//
+//    public MMR(int sim1Type, int sim2Type, Object[] initializers)
+//    {
+//        this.sim1Type = sim1Type;
+//        this.sim2Type = sim2Type;
+//        scores = new ConcurrentHashMap<>();
+//        sim1 = new CosineSim();
+//        sim2 = new CosineSim();
+//
+//        switch(sim1Type) {
+//            case COSINE_SIM: sim1 = new CosineSim();
+//            break;
+//            case LEXRANK_SIM:
+//                if(initializers.length != 3 || !((initializers[0] instanceof List)
+//                        && (((List)initializers[0]).get(0) instanceof List)
+//                        && ((((List)((List)initializers[0]).get(0)).get(0)) instanceof String))
+//                        || !(initializers[1] instanceof Double) || !(initializers[2] instanceof Double))
+//                    throw new Error("Must use constructer with an object array. "
+//                            + "Index 0 must contain a List<List<String>> of the document and "
+//                            + "Index 1 must contain the Cosine Similarity Threshold with value between 0 and 1."
+//                            + "Index 2 must contain the Query Bias with value between 0 and 1.");
+//                sim1 = new LexRankSim((List<List<String>>) initializers[0], (Double)initializers[1], (Double) initializers[2]);
+//                break;
+//            case JACCARD_SIM: sim1 = new JaccardSim();
+//            break;
+//            case PSEUDO_CODE_SIM:
+//                break;
+//            case COSINE_IDF_SIM:
+//                if(initializers.length != 1 || !(initializers[0] instanceof IDFMatrix))
+//                    throw new Error("Object array index 0 must contain an IDFMatrix.");
+//                break;
+//        }
+//
+//        switch(sim2Type) {
+//            case COSINE_SIM: sim2 = new CosineSim();
+//            break;
+//            case LEXRANK_SIM:
+//                if(initializers.length != 2 || !((initializers[0] instanceof List)
+//                        && (((List)initializers[0]).get(0) instanceof List)
+//                        && ((((List)((List)initializers[0]).get(0)).get(0)) instanceof String))
+//                        || !(initializers[1] instanceof Double) || !(initializers[2] instanceof Double))
+//                    throw new Error("Must use constructer with an object array. "
+//                            + "Index 0 must contain a List<List<String>> of the document and "
+//                            + "Index 1 must contain the Cosine Similarity Threshold with value between 0 and 1."
+//                            + "Index 2 must contain the Query Bias with value between 0 and 1.");
+//                sim1 = new LexRankSim((List<List<String>>) initializers[0], (Double)initializers[1], (Double)initializers[2]);
+//                break;
+//            case JACCARD_SIM: sim2 = new JaccardSim();
+//            break;
+//            case PSEUDO_CODE_SIM:
+//                break;
+//            case COSINE_IDF_SIM: if(initializers.length != 1 || !(initializers[0] instanceof IDFMatrix))
+//                throw new Error("Must use constructer with an object array. "
+//                        + "Index 0 must contain a List<List<String>> of the document and "
+//                        + "Index 1 must contain the Cosine Similarity Threshold with value between 0 and 1.");
+//            sim1 = new CosineSim((IDFMatrix)initializers[0]);
+//            break;
+//        }
+//    }
+//</editor-fold>

@@ -69,9 +69,9 @@ public class CosineSim implements SimMetric {
         FrequencyMatrix queryFrequencyMatrix = new FrequencyMatrix(query);
         
         double denominator;
-        int numerator = 0;
-        int aMagnitudeTotal = 0;
-        int bMagnitudeTotal = 0;
+        double numerator = 0;
+        double aMagnitudeTotal = 0;
+        double bMagnitudeTotal = 0;
         
         for(String word : document)
         {
@@ -83,7 +83,8 @@ public class CosineSim implements SimMetric {
         
         denominator = Math.sqrt(aMagnitudeTotal) * Math.sqrt(bMagnitudeTotal);
         
-        double sim = (double)numerator / denominator;
+        Double sim = numerator / denominator;
+        if(denominator == 0) return 0;
         return sim;
     }
 

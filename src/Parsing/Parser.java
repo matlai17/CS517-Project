@@ -27,6 +27,7 @@ public class Parser {
     
     public Parser(File f) throws FileNotFoundException, IOException
     {
+        String document = "";
         stemMap = new HashMap<>();
         stemList = new ArrayList<>();
         
@@ -35,25 +36,54 @@ public class Parser {
         String line;
         while((line = io.readLine()) != null)
         {
+            document += line + " ";
 //            String line = io.nextLine();
 //            System.out.println(line);
 //            line = line.replaceAll("[^\\n\\w. ]", "");
 //            String [] sentTokens = line.split("(?=.*?\\w{3,})(\\. |\\.$)");
-            for(String sentence : line.split("(?<=\\w[\\w\\)\\]\"](?<!Mrs?|Dr|Rev|Mr|Ms|vs|abd|ABD|Abd|resp|St|wt)[\\.\\?\\!\\:\\@]\\s)"))
+            if(line.equals("\n"))
             {
-                if(sentence.length() < 1) continue;
-                if(sentence.charAt(0) == ' ') sentence = sentence.substring(1);
-                ArrayList<String> sentVect = new ArrayList<String>();
-                ArrayList<String> stemmedSentVect = new ArrayList<String>();
-                for(String word : sentence.replaceAll("[^\\w ]", "").split("\\s")) 
+                document = document.trim();
+                for(String sentence : document.split("(?<=\\w[\\w\\)\\]\"](?<!Mrs?|Dr|Rev|Mr|Ms|vs|abd|ABD|Abd|resp|St|wt)[\\.\\?\\!\\:\\@]\\s)"))
                 {
-                    if(word.replaceAll("\\s\n", "").length() < 1) continue;
-                    word = word.replaceAll("[^\\w]", "");
-                    sentVect.add(word);
-                    stemmedSentVect.add(Stemmer.stemWord(word));
+                    if(sentence.length() < 1) continue;
+                    if(sentence.charAt(0) == ' ') sentence = sentence.substring(1);
+                    ArrayList<String> sentVect = new ArrayList<String>();
+                    ArrayList<String> stemmedSentVect = new ArrayList<String>();
+                    for(String word : sentence.replaceAll("[^\\w ]", "").split("\\s")) 
+                    {
+                        if(word.replaceAll("\\s\n", "").length() < 1) continue;
+                        word = word.replaceAll("[^\\w]", "");
+                        sentVect.add(word);
+                        stemmedSentVect.add(Stemmer.stemWord(word));
+                    }
+                    if(stemmedSentVect.size() > 0)
+                    {
+                        stemList.add(stemmedSentVect);
+                        stemMap.put(stemmedSentVect, sentence.trim());
+                    }
                 }
+                document = "";
+            }
+        }
+        document = document.trim();
+        for(String sentence : document.split("(?<=\\w[\\w\\)\\]\"](?<!Mrs?|Dr|Rev|Mr|Ms|vs|abd|ABD|Abd|resp|St|wt)[\\.\\?\\!\\:\\@]\\s)"))
+        {
+            sentence = sentence.trim();
+            if(sentence.length() < 1) continue;
+            ArrayList<String> sentVect = new ArrayList<String>();
+            ArrayList<String> stemmedSentVect = new ArrayList<String>();
+            for(String word : sentence.replaceAll("[^\\w ]", "").split("\\s")) 
+            {
+                if(word.replaceAll("\\s\n", "").length() < 1) continue;
+                word = word.replaceAll("[^\\w]", "");
+                sentVect.add(word);
+                stemmedSentVect.add(Stemmer.stemWord(word));
+            }
+            if(stemmedSentVect.size() > 0)
+            {
                 stemList.add(stemmedSentVect);
-                stemMap.put(stemmedSentVect, sentence);
+                stemMap.put(stemmedSentVect, sentence.trim());
             }
         }
     }
@@ -104,7 +134,6 @@ public class Parser {
 //        String test = "This is a test sentence. Test sentence two.";
 //        test = test.replaceAll("[^\\w ]", "");
 //        for(String s : test.split(" ")) System.out.println(Stemmer.stemWord(s));
-        
         
         Parser p = new Parser(new File("TestFile.txt"));
         List<List<String>> document = p.getStemmedDocument();
