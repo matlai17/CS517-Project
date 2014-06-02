@@ -8,8 +8,10 @@ import SimMetrics.LexRankSim;
 import SimMetrics.SimMetric;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Iterator;
 import java.util.List;
-
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
@@ -24,28 +26,34 @@ public class Main {
     
     public static void main(String[] args) throws IOException, InterruptedException {
         
-        File f = new File("Philo.txt");
-        Parser p = new Parser(f);
+        Parser p = new Parser();
+        File [] paths = new File[5];
+        paths[0] = new File("src/Documents/d132d"); //  Robert Rubin
+        paths[1] = new File("src/Documents/d133c"); //  Stephen Hawking
+        paths[2] = new File("src/Documents/d134h"); //  Desmond Tutu
+        paths[3] = new File("src/Documents/d135g"); //  Brian Jones
+        paths[4] = new File("src/Documents/d136c"); //  Gene Autry 
         
-        String query = "thought method";
-        System.out.println("REACHED1");
-//        mmr.startGeneratingScores(p.getStemmedDocument(), 7);
-//        Thread.sleep(10000);
-        System.out.println("REACHED2");
+        File files[] = paths[0].listFiles();
+        for(File f : files) p.addDocument(f);
         
-//        MMR mmr = new MMR(SimMetric.COSINE_IDF_SIM, SimMetric.JACCARD_SIM, new Object[]{new IDFMatrix(p.getStemmedDocument())});
-        IDFMatrix idf = new IDFMatrix(p.getStemmedDocument());
-        MMR mmr = new MMR(new CosineSim(idf), new JaccardSim());
+        MMR mmr = new MMR(new LexRankSim(p.getStemmedDocument(), new IDFMatrix(p.getStemmedDocument()), .2, .9), new CosineSim());
         
-        long time = System.currentTimeMillis();
-        List<List<String>> results = mmr.rankedList(p.getStemmedDocument(), Parser.vectorAndStem(query), .8, 10);
-        System.out.println("Time Taken (ms): " + (System.currentTimeMillis() - time));
-//        LexRankSim lRS = new LexRankSim(p.getStemmedDocument(), .2);
-//        System.out.println(lRS.retSize());
+        String query = "who is rubin";
+        List<List<String>> results = mmr.rankedList(p.getStemmedDocument(), Parser.vectorAndStem(query), 1, 10);
+        for(List<String> sentence : results)
+        {
+            System.out.println(p.getSentence(sentence) + "\n");
+        }
         
-        for(List<String> resultSent : results)
-            System.out.println(p.getSentence(resultSent));
+        System.out.println("\n\n");
         
+        query = "what are rubin's accomplishments";
+        results = mmr.rankedList(p.getStemmedDocument(), Parser.vectorAndStem(query), 1, 10);
+        for(List<String> sentence : results)
+        {
+            System.out.println(p.getSentence(sentence) + "\n");
+        }
         
     }
     

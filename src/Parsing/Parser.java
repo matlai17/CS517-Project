@@ -64,33 +64,21 @@ public class Parser {
             }
             if(markUpFile && line.startsWith("</TEXT>")) captureText = false;
             if(!captureText) continue;
+            
             document += line + " ";
             
             if(line.equals("\n"))
             {
-                document = document.trim();
-                for(String sentence : document.split("(?<=\\w[\\w\\)\\]\"](?<!Mrs?|Dr|Rev|Mr|Ms|vs|abd|ABD|Abd|resp|St|wt)[\\.\\?\\!\\:\\@]\\s)"))
-                {
-                    if(sentence.length() < 1) continue;
-                    if(sentence.charAt(0) == ' ') sentence = sentence.substring(1);
-                    ArrayList<String> sentVect = new ArrayList<String>();
-                    ArrayList<String> stemmedSentVect = new ArrayList<String>();
-                    for(String word : sentence.replaceAll("[^\\w ]", "").split("\\s")) 
-                    {
-                        if(word.replaceAll("\\s\n", "").length() < 1) continue;
-                        word = word.replaceAll("[^\\w]", "");
-                        sentVect.add(word);
-                        stemmedSentVect.add(Stemmer.stemWord(word));
-                    }
-                    if(stemmedSentVect.size() > 0)
-                    {
-                        stemList.add(stemmedSentVect);
-                        stemMap.put(stemmedSentVect, sentence.trim());
-                    }
-                }
+                stemDocument(document);
                 document = "";
             }
         }
+        stemDocument(document);
+    }
+    
+    private void stemDocument(String document)
+    {
+        document = document.replaceAll("<P>|</P>", "");
         document = document.trim();
         for(String sentence : document.split("(?<=\\w[\\w\\)\\]\"](?<!Mrs?|Dr|Rev|Mr|Ms|vs|abd|ABD|Abd|resp|St|wt)[\\.\\?\\!\\:\\@]\\s)"))
         {
