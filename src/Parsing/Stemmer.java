@@ -5,9 +5,13 @@ package Parsing;
 import java.io.*;
 
 
-
+/**
+ * An implementation of the Porter stemmer.
+ * 
+ */
 class Stemmer
-{  private char[] b;
+{
+   private char[] b;
    private int i,     
                i_end, 
                j, k;

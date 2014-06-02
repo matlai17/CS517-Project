@@ -1,14 +1,9 @@
 package MMR;
 
-
-import Matrix.IDFMatrix;
-import SimMetrics.CosineSim;
 import SimMetrics.JaccardSim;
-import SimMetrics.LexRankSim;
 import SimMetrics.SimMetric;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
@@ -24,12 +19,8 @@ import java.util.logging.Logger;
  * Documents and Producing Summaries". Allows ranking of documents, not only by their 
  * relevance to a query, but by their marginality to other relevant documents.
  * 
- * To add a new Similarity Metric, assign it a unique integer identification
- * and name as a "static final int" variable. This new identification does not 
- * needed to be added the the SimMetric interface file. Then add the new metric to the 
- * second constructor in the Switch-Case using the new similarity metric's 
- * identification as the case statement. Then simply initialize the MMR class
- * using the new metric's identification.
+ * To use a new Similarity Metric, simple implement the SimMetric interface within the desired new Similarity Metric
+ * and pass it into the MMR constructor.
  * 
  * @author Matthew Lai
  */
@@ -208,15 +199,12 @@ public class MMR {
     int sim2Type;
     SimMetric sim1;
     SimMetric sim2;
-    static final int LEXRANK_SIM = SimMetric.LEXRANK_SIM;
-    static final int COSINE_SIM = SimMetric.COSINE_SIM;
-    static final int JACCARD_SIM = SimMetric.JACCARD_SIM;
-    static final int PSEUDO_CODE_SIM = SimMetric.PSEUDO_CODE_SIM;
-    static final int COSINE_IDF_SIM = SimMetric.COSINE_IDF_SIM;
 //</editor-fold>
 
 //<editor-fold defaultstate="collapsed" desc="Constructors">
-    
+    /**
+     * Default constructer uses JaccardSim for both similarity metrics.
+     */
     public MMR()
     {
         scores = new ConcurrentHashMap<>();
@@ -258,7 +246,6 @@ public class MMR {
         ArrayList<List<String>> r_sList = new ArrayList<>(documentList);
         while(!r_sList.isEmpty())
         {
-//            System.out.println(r_sList.size());
             Document_Score retrievedDocument = retrieveDocument(r_sList, sList, query, lambda);
             sList.add(retrievedDocument);
             r_sList.remove(retrievedDocument.getDocument());
@@ -358,158 +345,4 @@ public class MMR {
         }
         return maxScore;
     }
- 
-    public static void main(String[] args) {
-        
-//        DoubleDoc one = new MMR().new DoubleDoc(new ArrayList<String>(), new ArrayList<String>(), 1);
-//        DoubleDoc two = new MMR().new DoubleDoc(new ArrayList<String>(), new ArrayList<String>(), 1);
-////        System.out.println(one.equals(two));
-//        HashSet<DoubleDoc> test = new HashSet<>();
-//        System.out.println(test.add(one));
-//        System.out.println(test.add(two));
-//        System.out.println(test.size());
-//        System.out.println("");
-        
-        List<List<String>> documents = new ArrayList<>();
-        ArrayList<String> query = new ArrayList<>();
-        
-        String documentText[] = { "abcdxyz" , "abcdefg", "hijklmn", "opqrstu", "vwxyz"};
-        String queryText = "abcdxyzhio";
-        
-        for (int i = 0; i < documentText.length; i++) {
-            ArrayList<String> document = new ArrayList<>();
-            for(int j = 0; j < documentText[i].length(); j++){
-                document.add(documentText[i].charAt(j) + "");
-            }
-            documents.add(document);
-        }
-        
-        for(int i = 0; i < queryText.length(); i++) query.add(queryText.charAt(i) + "");
-        
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////        
-//                                             Change This Lambda Value to Test Algorithm                                     //
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        
-        double lambda = 1;
-        
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////        
-//                                             Change This Lambda Value to Test Algorithm                                     //
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////        
-        
-//        List<List<String>> ret = new MMR().rankedList(documents, query, lambda, 5);
-//        
-//        for(List<String> retSent : ret)
-//        {
-//            for(String word : retSent) 
-//            {
-//                System.out.print(word + "\t");
-//            }
-//            System.out.println("");
-//        }
-    }
 }
-
-
-
-
-//<editor-fold defaultstate="collapsed" desc="Deprecated MMR Constructors">
-
-//    public MMR(int sim1Type, int sim2Type)
-//    {
-//        this.sim1Type = sim1Type;
-//        this.sim2Type = sim2Type;
-//        scores = new ConcurrentHashMap<>();
-//        sim1 = new CosineSim();
-//        sim2 = new CosineSim();
-//
-//        switch(sim1Type) {
-//            case COSINE_SIM: sim1 = new CosineSim();
-//            break;
-//            case LEXRANK_SIM: throw new Error("Must use constructer with an object array. "
-//                    + "Index 0 must contain a List<List<String>> of the document and "
-//                    + "Index 1 must contain the Cosine Similarity Threshold with value between 0 and 1."
-//                            + "Index 2 must contain the Query Bias with value between 0 and 1.");
-//            case JACCARD_SIM: sim1 = new JaccardSim();
-//            break;
-//            case PSEUDO_CODE_SIM:
-//                break;
-//            case COSINE_IDF_SIM: throw new Error("Must use constructer with an object array. "
-//                    + "Index 0 must contain an IDFMatrix.");
-//        }
-//
-//        switch(sim2Type) {
-//            case COSINE_SIM: sim2 = new CosineSim();
-//            break;
-//            case LEXRANK_SIM: throw new Error("Must use constructer with an object array. "
-//                    + "Index 0 must contain a List<List<String>> of the document and "
-//                    + "Index 1 must contain the Cosine Similarity Threshold with value between 0 and 1."
-//                            + "Index 2 must contain the Query Bias with value between 0 and 1.");
-//            case JACCARD_SIM: sim2 = new JaccardSim();
-//            break;
-//            case PSEUDO_CODE_SIM:
-//                break;
-//            case COSINE_IDF_SIM: throw new Error("Must use constructer with an object array. "
-//                    + "Index 0 must contain an IDFMatrix.");
-//
-//        }
-//    }
-//
-//    public MMR(int sim1Type, int sim2Type, Object[] initializers)
-//    {
-//        this.sim1Type = sim1Type;
-//        this.sim2Type = sim2Type;
-//        scores = new ConcurrentHashMap<>();
-//        sim1 = new CosineSim();
-//        sim2 = new CosineSim();
-//
-//        switch(sim1Type) {
-//            case COSINE_SIM: sim1 = new CosineSim();
-//            break;
-//            case LEXRANK_SIM:
-//                if(initializers.length != 3 || !((initializers[0] instanceof List)
-//                        && (((List)initializers[0]).get(0) instanceof List)
-//                        && ((((List)((List)initializers[0]).get(0)).get(0)) instanceof String))
-//                        || !(initializers[1] instanceof Double) || !(initializers[2] instanceof Double))
-//                    throw new Error("Must use constructer with an object array. "
-//                            + "Index 0 must contain a List<List<String>> of the document and "
-//                            + "Index 1 must contain the Cosine Similarity Threshold with value between 0 and 1."
-//                            + "Index 2 must contain the Query Bias with value between 0 and 1.");
-//                sim1 = new LexRankSim((List<List<String>>) initializers[0], (Double)initializers[1], (Double) initializers[2]);
-//                break;
-//            case JACCARD_SIM: sim1 = new JaccardSim();
-//            break;
-//            case PSEUDO_CODE_SIM:
-//                break;
-//            case COSINE_IDF_SIM:
-//                if(initializers.length != 1 || !(initializers[0] instanceof IDFMatrix))
-//                    throw new Error("Object array index 0 must contain an IDFMatrix.");
-//                break;
-//        }
-//
-//        switch(sim2Type) {
-//            case COSINE_SIM: sim2 = new CosineSim();
-//            break;
-//            case LEXRANK_SIM:
-//                if(initializers.length != 2 || !((initializers[0] instanceof List)
-//                        && (((List)initializers[0]).get(0) instanceof List)
-//                        && ((((List)((List)initializers[0]).get(0)).get(0)) instanceof String))
-//                        || !(initializers[1] instanceof Double) || !(initializers[2] instanceof Double))
-//                    throw new Error("Must use constructer with an object array. "
-//                            + "Index 0 must contain a List<List<String>> of the document and "
-//                            + "Index 1 must contain the Cosine Similarity Threshold with value between 0 and 1."
-//                            + "Index 2 must contain the Query Bias with value between 0 and 1.");
-//                sim1 = new LexRankSim((List<List<String>>) initializers[0], (Double)initializers[1], (Double)initializers[2]);
-//                break;
-//            case JACCARD_SIM: sim2 = new JaccardSim();
-//            break;
-//            case PSEUDO_CODE_SIM:
-//                break;
-//            case COSINE_IDF_SIM: if(initializers.length != 1 || !(initializers[0] instanceof IDFMatrix))
-//                throw new Error("Must use constructer with an object array. "
-//                        + "Index 0 must contain a List<List<String>> of the document and "
-//                        + "Index 1 must contain the Cosine Similarity Threshold with value between 0 and 1.");
-//            sim1 = new CosineSim((IDFMatrix)initializers[0]);
-//            break;
-//        }
-//    }
-//</editor-fold>

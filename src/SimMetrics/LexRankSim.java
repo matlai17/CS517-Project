@@ -1,50 +1,11 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- *//*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- *//*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- *//*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- *//*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- *//*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- *//*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- *//*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 
 package SimMetrics;
 
 import Matrix.FrequencyMatrix;
 import Matrix.IDFMatrix;
-import Parsing.Parser;
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
-import java.util.PriorityQueue;
-import java.util.SortedMap;
 import org.ejml.data.DenseMatrix64F;
 import org.ejml.ops.CommonOps;
 
@@ -214,22 +175,7 @@ public class LexRankSim implements SimMetric {
         CommonOps.scale(1-queryBias, sMatrix);
         CommonOps.add(rMatrix, sMatrix, qMatrix);
         CommonOps.transpose(qMatrix);
-//        qMatrix.print();
-//        DenseMatrix64F result = new DenseMatrix64F(sMatrix.numCols, sMatrix.numRows);
-//        for (int i = 0; i < 10; i++)
-//        {
-//            CommonOps.mult(qMatrix, qMatrix, result);
-//            qMatrix = result.copy();
-//            qMatrix.print();
-//        }
-//        EigenOps.computeEigenVector(qMatrix, 1).vector.print();
-//        EigenDecomposition eD = DecompositionFactory.eig(qMatrix.numCols, true, true);
-//        eD.decompose(qMatrix);
-//        for (int i = 0; i < eD.getNumberOfEigenvalues(); i++) {
-//            System.out.println(eD.getEigenvalue(i).getReal());
-//            eD.getEigenVector(i).print();
-//            System.out.println("\n");
-//        }
+        
         calculatedMatrix.set(0, 0, 1);
         DenseMatrix64F result = new DenseMatrix64F(qMatrix.numCols, 1);
         for(int i = 0; i < 50; i++)
@@ -240,77 +186,4 @@ public class LexRankSim implements SimMetric {
         
         return calculatedMatrix;
     }
-
-    @Override
-    public SortedMap<List<String>, Double> orderedDocuments(List<List<String>> documentList, List<String> query) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-    
-    public static void main(String[] args) throws IOException {
-        
-//        DenseMatrix64F test = new DenseMatrix64F(2,2);
-//        test.set(0, 0, .6);
-//        test.set(1, 0, .4);
-//        test.set(0, 1, .2);
-//        test.set(1, 1, .8);
-//        test.print();
-//        
-//        DenseMatrix64F result = new DenseMatrix64F(2,1);
-//        result.set(0, 0, .5);
-//        result.set(1, 0, .5);
-//        result.print();
-//        
-//        
-//        DenseMatrix64F c = new DenseMatrix64F(2,1);
-//        
-//        for(int i = 0; i < 10; i++)
-//        {
-//            CommonOps.mult(test, result, c);
-//            result = c.copy();
-//            result.print();
-//        }
-        
-        Parser p = new Parser(new File("CalPolyNews.txt"));
-        List<List<String>> document = p.getStemmedDocument();
-//        for(List<String> sentence : document ) System.out.println(p.getSentence(sentence));
-        LexRankSim test = new LexRankSim(document, new IDFMatrix(document), 0.0, .7);
-        
-//        System.out.println(test.calculateQMatrix(Parser.vectorAndStem("economic and rubin")));
-
-        java.util.PriorityQueue<Document_Score> scoredDocuments = new PriorityQueue<>(document.size(), new Comparator<Document_Score>() {
-
-            @Override
-            public int compare(Document_Score o1, Document_Score o2) {
-                if(o1.getScore() == o2.getScore()) return 1;
-                return -Double.compare(o1.getScore(), o2.getScore());
-            }
-        });
-        for(List<String> sentence : document)
-            scoredDocuments.add(test.new Document_Score(sentence, test.documentRank(sentence, Parser.vectorAndStem("economic and rubin"))));
-        
-//        System.out.println(p.getSentence(document.get(3)));
-        while(!scoredDocuments.isEmpty())
-        {
-            Document_Score ds = scoredDocuments.poll();
-            System.out.println(ds.getScore() + "\t:\t" + p.getSentence(ds.getDocument()));
-        }
-    }
-    
-        /**
-     * Document_Score is a private class to pass and store the pair of a document
-     * and its MMR score. Allows for comparison.
-     */
-    private class Document_Score
-    {
-        private final List<String> document;
-        private final double score;
-        public Document_Score(List<String> document, double score)
-        {
-            this.document = document;
-            this.score = score;
-        }
-        public List<String> getDocument() { return document; }
-        public double getScore() { return score; }
-    }
-    
 }

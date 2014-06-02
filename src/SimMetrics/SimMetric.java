@@ -13,27 +13,6 @@ import java.util.SortedMap;
 public interface SimMetric {
     
     /**
-     * The integer representation of a certain Graphical Similarity Metric.
-     */
-    static final int LEXRANK_SIM = 1;
-    /**
-     * The integer representation of the Cosine Similarity Metric.
-     */
-    static final int COSINE_SIM = 2;
-    /**
-     * The integer representation of the Jaccard Similarity Metric.
-     */
-    static final int JACCARD_SIM = 3;
-    /**
-     * The integer representation of a certain Pseudo-Code Similarity Metric.
-     */
-    static final int PSEUDO_CODE_SIM = 4;
-    /**
-     * The integer representation of a certain Pseudo-Code Similarity Metric.
-     */
-    static final int COSINE_IDF_SIM = 5;
-    
-    /**
      * Returns the ranking of the sentence given the implemented similarity 
      * metric algorithm, the sentence, and the query. The ranking should 
      * represent the similarity between the query and the sentence.
@@ -55,5 +34,5 @@ public interface SimMetric {
      * 
      * @return a map of the sentences ordered from greatest to least similarity to the query. 
      */
-    public SortedMap<List<String>, Double> orderedDocuments(List<List<String>> documentList, List<String> query);
+//    public SortedMap<List<String>, Double> orderedDocuments(List<List<String>> documentList, List<String> query);
 }

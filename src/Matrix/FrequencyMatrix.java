@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 
 package Matrix;
 
@@ -11,7 +6,9 @@ import java.util.HashMap;
 import java.util.List;
 
 /**
- *
+ * Frequency Matrix stores the word frequency of the input document or sentence.
+ * Allows for a word query to get the frequency of a word.
+ * 
  * @author Matthew Lai
  */
 public class FrequencyMatrix {

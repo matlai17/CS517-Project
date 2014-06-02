@@ -87,45 +87,4 @@ public class CosineSim implements SimMetric {
         if(denominator == 0) return 0;
         return sim;
     }
-
-    @Override
-    public SortedMap<List<String>, Double> orderedDocuments(List<List<String>> documentList, List<String> query) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-    
-    public static void main(String[] args) {
-        ArrayList<ArrayList<String>> documents = new ArrayList<>();
-        ArrayList<String> query = new ArrayList<>();
-        ArrayList<String> document = new ArrayList<>();
-        
-        String documentA[] = {"Divis", "of", "Univers", "Advancement"};
-        String queryA[] = {"Office", "of", "Public", "Affair", "New", "Releas" };
-        
-        for(String s : documentA) document.add(s);
-        for(String s : queryA) query.add(s);
-        
-        System.out.println(new CosineSim().documentRank(document, query));
-//        String documentText[] = { "abcdef" , "wxyz" };
-//        String queryText = "abcdzyx";
-        
-//        for (int i = 0; i < documentText.length; i++) {
-//            ArrayList<String> document = new ArrayList<>();
-//            for(int j = 0; j < documentText[i].length(); j++){
-//                document.add(documentText[i].charAt(j) + "");
-//            }
-//            documents.add(document);
-//        }
-//        
-//        for(int i = 0; i < queryText.length(); i++) query.add(queryText.charAt(i) + "");
-        
-//        for(ArrayList<String> document : documents)
-//        {
-//            for(String word : document) System.out.print(word + " ");
-//            System.out.print("\t");
-//            for(String word : query) System.out.print(word + " ");
-//            System.out.print(" : \t");
-//            System.out.println(new CosineSim().documentRank(document, query));
-//        }
-    }
-    
 }
