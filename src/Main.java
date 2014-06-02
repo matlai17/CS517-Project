@@ -28,11 +28,11 @@ public class Main {
         
         Parser p = new Parser();
         File [] paths = new File[5];
-        paths[0] = new File("src/Documents/d132d"); //  Robert Rubin
-        paths[1] = new File("src/Documents/d133c"); //  Stephen Hawking
-        paths[2] = new File("src/Documents/d134h"); //  Desmond Tutu
-        paths[3] = new File("src/Documents/d135g"); //  Brian Jones
-        paths[4] = new File("src/Documents/d136c"); //  Gene Autry 
+        paths[0] = new File("test/Documents/d132d"); //  Robert Rubin
+        paths[1] = new File("test/Documents/d133c"); //  Stephen Hawking
+        paths[2] = new File("test/Documents/d134h"); //  Desmond Tutu
+        paths[3] = new File("test/Documents/d135g"); //  Brian Jones
+        paths[4] = new File("test/Documents/d136c"); //  Gene Autry 
         
         File files[] = paths[0].listFiles();
         for(File f : files) p.addDocument(f);
