@@ -1,16 +1,11 @@
 
 import MMR.MMR;
+import MMR.MMR.Document_Score;
 import Matrix.IDFMatrix;
 import Parsing.Parser;
-import SimMetrics.CosineSim;
-import SimMetrics.JaccardSim;
-import SimMetrics.LexRankSim;
-import SimMetrics.SimMetric;
+import SimMetrics.*;
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Scanner;
 /*
@@ -26,6 +21,7 @@ import java.util.Scanner;
 public class Main {
     
     public static void main(String[] args) throws IOException, InterruptedException {
+        
         if(args.length == 0)
         {
             Parser p[] = new Parser[5];
@@ -65,10 +61,10 @@ public class Main {
                 
                 else
                 {
-                    List<List<String>> results = topics[fileNum].rankedList(p[fileNum].getStemmedDocument(), Parser.vectorAndStem(query), lambda, 10);
+                    List<Document_Score> results = topics[fileNum].rankedAndList(p[fileNum].getStemmedDocument(), Parser.vectorAndStem(query), lambda, 10);
                     System.out.println("Topic: " + topicName[fileNum]);
                     System.out.println("Query: " + query + "\n");
-                    for(List<String> sentence : results) System.out.println(p[fileNum].getSentence(sentence) + "\n");
+                    for(Document_Score sentence : results) System.out.println(sentence.getScore() + "\t" + p[fileNum].getSentence(sentence.getDocument()) + "\n");
                 }
                 System.out.print("Enter a query: ");
             }
@@ -88,10 +84,10 @@ public class Main {
                 System.out.print("Enter a query: ");
                 while(!((query = io.nextLine()).equalsIgnoreCase("exit") || query.equalsIgnoreCase("quit")))
                 {
-                    List<List<String>> results = fMMR.rankedList(p2.getStemmedDocument(), Parser.vectorAndStem(query), .9, 10);
+                    List<Document_Score> results = fMMR.rankedAndList(p2.getStemmedDocument(), Parser.vectorAndStem(query), .9, 10);
                     System.out.println("Topic: " + fileName);
                     System.out.println("Query: " + query + "\n");
-                    for(List<String> sentence : results) System.out.println(p2.getSentence(sentence) + "\n");
+                    for(Document_Score sentence : results) System.out.println(sentence.getScore() + "\t" + p2.getSentence(sentence.getDocument()) + "\n");
                     System.out.print("Enter a query: ");
                 }
             }

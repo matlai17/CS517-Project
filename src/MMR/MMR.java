@@ -26,7 +26,7 @@ import java.util.logging.Logger;
  */
 public class MMR {
 
-//<editor-fold defaultstate="collapsed" desc="A class designed to speedup MMR by concurrently calculating sim scores. Does not provide any discernable speedup.">
+//<editor-fold defaultstate="collapsed" desc="A class designed to speed up MMR by concurrently calculating sim scores. Does not provide any discernable speedup.">
     
     private class GenerateScores implements Runnable
     {
@@ -124,12 +124,12 @@ public class MMR {
    
 //</editor-fold>
     
-//<editor-fold defaultstate="collapsed" desc="Private utility classes">
+//<editor-fold defaultstate="collapsed" desc="Utility classes">
     /**
      * Document_Score is a private class to pass and store the pair of a document
      * and its MMR score. Allows for comparison.
      */
-    private class Document_Score
+    public class Document_Score
     {
         private final List<String> document;
         private final double score;
@@ -216,7 +216,7 @@ public class MMR {
     {
         this.sim1 = sim1;
         this.sim2 = sim2;
-        scores = new ConcurrentHashMap<DoubleDoc, Double>();
+        scores = new ConcurrentHashMap<>();
     }
 
 //</editor-fold>
@@ -255,6 +255,46 @@ public class MMR {
         for(Document_Score ds : sList) 
         {
             rankedList.add(ds.getDocument());
+            if(rankedList.size() >= maxResults) break;
+        }
+        
+        return rankedList;
+    }
+    
+    /**
+     * Returns a ranked list given the a list of documents, a query, and a lambda value.
+     * The list will be ranked according to the lambda value. A lambda value of 0 will
+     * return a list ranked more on diversity while a lambda value of 1 will return a 
+     * standard relevance ranked list. It is recommended the lambda value be between 
+     * 0 and 1.
+     * 
+     * @param documentList Documents stored in a list as a list of Strings, representing its words
+     * @param query A query represented as a list of Strings, representing query words
+     * @param lambda The lambda value to determine MMR search ranking
+     * @param maxResults The maximum size of the returned resulting ranked list.
+     * @return The list of ranked sentences, ranked according to the lambda value
+     */
+    public List<Document_Score> rankedAndList(List<List<String>> documentList, List<String> query, double lambda, int maxResults)
+    {
+        TreeSet<Document_Score> sList = new TreeSet<>(new Comparator<Document_Score>() {
+            @Override
+            public int compare(Document_Score o1, Document_Score o2) {
+                if(o1.getScore() == o2.getScore()) return 1;
+                return -Double.compare(o1.getScore(), o2.getScore());
+            }
+        });
+        ArrayList<List<String>> r_sList = new ArrayList<>(documentList);
+        while(!r_sList.isEmpty())
+        {
+            Document_Score retrievedDocument = retrieveDocument(r_sList, sList, query, lambda);
+            sList.add(retrievedDocument);
+            r_sList.remove(retrievedDocument.getDocument());
+        }
+        
+        ArrayList<Document_Score> rankedList = new ArrayList<>();
+        for(Document_Score ds : sList) 
+        {
+            rankedList.add(ds);
             if(rankedList.size() >= maxResults) break;
         }
         

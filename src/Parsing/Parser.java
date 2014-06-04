@@ -57,7 +57,7 @@ public class Parser {
         while((line = io.readLine()) != null)
         {
             if(line.startsWith("<DOC>")) markUpFile = true;
-            else captureText = true;
+            else if(!markUpFile) captureText = true;
             if(markUpFile && line.startsWith("<TEXT>"))
             {
                 captureText = true;
@@ -81,7 +81,7 @@ public class Parser {
     {
         document = document.replaceAll("<P>|</P>", "");
         document = document.trim();
-        for(String sentence : document.split("(?<=\\w[\\w\\)\\]\"](?<!Mrs?|Dr|Rev|Mr|Ms|vs|abd|ABD|Abd|resp|St|wt)[\\.\\?\\!\\:\\@]\\s)"))
+        for(String sentence : document.split("(?<=\\w[\\w\\)\\]\"](?<!Mrs?|Dr|Rev|Mr|Ms|vs|abd|ABD|Abd|resp|St|wt)[\\.\\?\\!\\@\\_][\\\"']{0,2}\\s)"))
         {
             sentence = sentence.trim();
             if(sentence.length() < 1) continue;
