@@ -57,6 +57,7 @@ public class Parser {
         while((line = io.readLine()) != null)
         {
             if(line.startsWith("<DOC>")) markUpFile = true;
+            else captureText = true;
             if(markUpFile && line.startsWith("<TEXT>"))
             {
                 captureText = true;
