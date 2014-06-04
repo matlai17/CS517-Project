@@ -26,30 +26,27 @@ import java.util.Scanner;
 public class Main {
     
     public static void main(String[] args) throws IOException, InterruptedException {
-        Parser p[] = new Parser[5];
-        File [] paths = new File[5];
-        paths[0] = new File("test/Documents/d132d"); //  Robert Rubin
-        paths[1] = new File("test/Documents/d133c"); //  Stephen Hawking
-        paths[2] = new File("test/Documents/d134h"); //  Desmond Tutu
-        paths[3] = new File("test/Documents/d135g"); //  Brian Jones
-        paths[4] = new File("test/Documents/d136c"); //  Gene Autry 
-
-        for(int i = 0; i < p.length; i++)
-        {
-            File files[] = paths[i].listFiles();
-            p[i] = new Parser();
-            for(File f : files) p[i].addDocument(f);
-        }
-        
-        MMR []topics = new MMR[paths.length];
-        for(int i = 0; i < topics.length; i++)
-        {
-            topics[i] = new MMR(new LexRankSim(p[i].getStemmedDocument(), new IDFMatrix(p[i].getStemmedDocument()), .2, .9), new CosineSim());
-//            MMR mmr = new MMR(new LexRankSim(p[i].getStemmedDocument(), new IDFMatrix(p[i].getStemmedDocument()), .2, .9), new CosineSim());
-        }
-        
         if(args.length == 0)
         {
+            Parser p[] = new Parser[5];
+            File [] paths = new File[5];
+            paths[0] = new File("test/Documents/d132d"); //  Robert Rubin
+            paths[1] = new File("test/Documents/d133c"); //  Stephen Hawking
+            paths[2] = new File("test/Documents/d134h"); //  Desmond Tutu
+            paths[3] = new File("test/Documents/d135g"); //  Brian Jones
+            paths[4] = new File("test/Documents/d136c"); //  Gene Autry 
+
+            for(int i = 0; i < p.length; i++)
+            {
+                File files[] = paths[i].listFiles();
+                p[i] = new Parser();
+                for(File f : files) p[i].addDocument(f);
+            }
+
+            MMR []topics = new MMR[paths.length];
+            for(int i = 0; i < topics.length; i++)
+                topics[i] = new MMR(new LexRankSim(p[i].getStemmedDocument(), new IDFMatrix(p[i].getStemmedDocument()), .2, .9), new CosineSim());
+        
             Scanner io = new Scanner(System.in);
             String query;
             int fileNum = 0;
