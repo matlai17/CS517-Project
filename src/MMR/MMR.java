@@ -4,6 +4,8 @@ import SimMetrics.JaccardSim;
 import SimMetrics.SimMetric;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
@@ -234,8 +236,19 @@ public class MMR {
      * @param maxResults The maximum size of the returned resulting ranked list.
      * @return The list of ranked sentences, ranked according to the lambda value
      */
-    public List<List<String>> rankedList(List<List<String>> documentList, List<String> query, double lambda, int maxResults)
+    public List<List<String>> rankedList(List<List<String>> documentList, List<String> query, double lambda, double omega, int maxResults)
     {
+        ArrayList<List<String>> r_sList = new ArrayList<>();
+        for(List<String> sentence : documentList)
+        {
+            double score = sim1.documentRank(sentence, query);
+            if(score > omega) 
+            {
+                r_sList.add(sentence);
+                scores.put(new DoubleDoc(sentence, query, sim1Type), score);
+            }
+        }
+        
         TreeSet<Document_Score> sList = new TreeSet<>(new Comparator<Document_Score>() {
             @Override
             public int compare(Document_Score o1, Document_Score o2) {
@@ -243,7 +256,6 @@ public class MMR {
                 return -Double.compare(o1.getScore(), o2.getScore());
             }
         });
-        ArrayList<List<String>> r_sList = new ArrayList<>(documentList);
         while(!r_sList.isEmpty())
         {
             Document_Score retrievedDocument = retrieveDocument(r_sList, sList, query, lambda);
@@ -268,14 +280,24 @@ public class MMR {
      * standard relevance ranked list. It is recommended the lambda value be between 
      * 0 and 1.
      * 
-     * @param documentList Documents stored in a list as a list of Strings, representing its words
+     * @param documentList Documents stored in a list as a list of Strings, representing its words. Words should be stemmed and Stopwords removed before being sent here
      * @param query A query represented as a list of Strings, representing query words
      * @param lambda The lambda value to determine MMR search ranking
      * @param maxResults The maximum size of the returned resulting ranked list.
      * @return The list of ranked sentences, ranked according to the lambda value
      */
-    public List<Document_Score> rankedAndList(List<List<String>> documentList, List<String> query, double lambda, int maxResults)
+    public List<Document_Score> rankedAndList(List<List<String>> documentList, List<String> query, double lambda, double omega, int maxResults)
     {
+        ArrayList<List<String>> r_sList = new ArrayList<>();
+        for(List<String> sentence : documentList)
+        {
+            double score = sim1.documentRank(sentence, query);
+            if(score > omega) 
+            {
+                r_sList.add(sentence);
+                scores.put(new DoubleDoc(sentence, query, sim1Type), score);
+            }
+        }
         TreeSet<Document_Score> sList = new TreeSet<>(new Comparator<Document_Score>() {
             @Override
             public int compare(Document_Score o1, Document_Score o2) {
@@ -283,7 +305,6 @@ public class MMR {
                 return -Double.compare(o1.getScore(), o2.getScore());
             }
         });
-        ArrayList<List<String>> r_sList = new ArrayList<>(documentList);
         while(!r_sList.isEmpty())
         {
             Document_Score retrievedDocument = retrieveDocument(r_sList, sList, query, lambda);

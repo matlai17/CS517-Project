@@ -88,6 +88,8 @@ public class Parser {
         for(String sentence : document.split("(?<=\\w[\\w\\)\\]\"](?<!Mrs?|Dr|Rev|Mr|Ms|vs|abd|ABD|Abd|resp|St|wt)[\\.\\?\\!\\@\\_][\\\"']{0,2}\\s)"))
         {
             sentence = sentence.trim();
+            sentence = sentence.replaceFirst("^[A-Z- ]+,?[ ]?[a-zA-Z]*?[ ]?(?:\\([A-Z][a-zA-Z ]*\\))? _", "");
+            sentence = sentence.trim();
             if(sentence.length() < 1) continue;
 //            ArrayList<String> sentVect = new ArrayList<String>();
             ArrayList<String> stemmedSentVect = new ArrayList<String>();

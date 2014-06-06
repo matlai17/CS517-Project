@@ -1,0 +1,5 @@
+Blank Queries
+
+Without threading 		161 minutes
+With Topic Threading	 87 minutes
+With Max Threading		 
