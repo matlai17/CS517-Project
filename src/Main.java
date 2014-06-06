@@ -21,7 +21,7 @@ import java.util.Scanner;
 public class Main {
     
     public static void main(String[] args) throws IOException, InterruptedException {
-        
+        Parser.populateStopwords(new File("src/Parsing/Stopwords.txt"));
         if(args.length == 0)
         {
             Parser p[] = new Parser[5];

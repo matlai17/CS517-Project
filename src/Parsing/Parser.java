@@ -10,11 +10,14 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Scanner;
 
 public class Parser {
     
     HashMap<List<String>, String> stemMap;
     List<List<String>> stemList;
+    static HashSet<String> stopwords = new HashSet<>();
     
     /**
      * Constructor takes a file and parses the file. 
@@ -25,6 +28,7 @@ public class Parser {
      */
     public Parser(File f) throws FileNotFoundException, IOException
     {
+        stopwords = new HashSet<>();
         stemMap = new HashMap<>();
         stemList = new ArrayList<>();
         addDocument(f);
@@ -85,14 +89,14 @@ public class Parser {
         {
             sentence = sentence.trim();
             if(sentence.length() < 1) continue;
-            ArrayList<String> sentVect = new ArrayList<String>();
+//            ArrayList<String> sentVect = new ArrayList<String>();
             ArrayList<String> stemmedSentVect = new ArrayList<String>();
             for(String word : sentence.replaceAll("[^\\w ]", "").split("\\s")) 
             {
                 if(word.replaceAll("\\s\n", "").length() < 1) continue;
                 word = word.replaceAll("[^\\w]", "");
-                sentVect.add(word);
-                stemmedSentVect.add(Stemmer.stemWord(word));
+//                sentVect.add(word);
+                if(!stopwords.contains(word)) stemmedSentVect.add(Stemmer.stemWord(word));
             }
             if(stemmedSentVect.size() > 0)
             {
@@ -110,14 +114,11 @@ public class Parser {
      */
     public static List<String> vectorAndStem(String sentence)
     {
-        
-        ArrayList<String> sentVect = new ArrayList<String>();
         ArrayList<String> stemmedSentVect = new ArrayList<String>();
         for(String word : sentence.replaceAll("[^\\w ]", "").split("\\s")) 
         {
             word = word.replaceAll("[^\\w]", "");
-            sentVect.add(word);
-            stemmedSentVect.add(Stemmer.stemWord(word));
+            if(!stopwords.contains(word.trim())) stemmedSentVect.add(Stemmer.stemWord(word));
         }
         
         
@@ -144,5 +145,11 @@ public class Parser {
     public String getSentence(List<String> stemmedVector)
     {
         return stemMap.get(stemmedVector);
+    }
+
+    public static void populateStopwords(File f) throws FileNotFoundException {
+        Scanner io = new Scanner(f);
+        
+        while(io.hasNextLine()) stopwords.add(Stemmer.stemWord(io.nextLine()));
     }
 }
