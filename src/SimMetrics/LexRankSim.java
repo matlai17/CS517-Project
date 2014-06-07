@@ -136,7 +136,7 @@ public class LexRankSim implements SimMetric {
     @Override
     public Double documentRank(List<String> document, List<String> query) 
     {
-        if(matrixIndex.indexOf(document) == -1) return null;
+        if(!matrixIndex.contains(document)) return null;
         DenseMatrix64F calculatedMatrix = qMatrixMap.get(query);
         if(calculatedMatrix == null) calculatedMatrix = calculateQMatrix(query);
         return calculatedMatrix.get(matrixIndex.indexOf(document));

@@ -1,19 +1,14 @@
 package MMR;
 
-import SimMetrics.JaccardSim;
+import SimMetrics.CosineSim;
 import SimMetrics.SimMetric;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * A Multi-Document ranking and summarization program the implements the algorithm set
@@ -24,107 +19,13 @@ import java.util.logging.Logger;
  * To use a new Similarity Metric, simple implement the SimMetric interface within the desired new Similarity Metric
  * and pass it into the MMR constructor.
  * 
+ * Any document passed into MMR should already be pre-processed. The documents should be in the form of 
+ * Lists of Lists of Strings. The Lists of Strings represent a sentence while the List of List of Strings represent
+ * the list of sentences that form a document.
+ * 
  * @author Matthew Lai
  */
 public class MMR {
-
-//<editor-fold defaultstate="collapsed" desc="A class designed to speed up MMR by concurrently calculating sim scores. Does not provide any discernable speedup.">
-    
-    private class GenerateScores implements Runnable
-    {
-        MMR parent;
-        GenerateScores thisParent;
-        List<List<String>> documents;
-        AtomicInteger loopIndex, index;
-        boolean isMaster, kill;
-        Thread [] threadList;
-        public GenerateScores(MMR p, List<List<String>> docs, boolean m, GenerateScores tP, int numP)
-        {
-            threadList = new Thread[numP];
-            index = new AtomicInteger(0);
-            loopIndex = new AtomicInteger(0);
-            parent = p;
-            documents = docs;
-            isMaster = m;
-            kill = false;
-            thisParent = tP;
-        }
-
-        public GenerateScores(MMR p, List<List<String>> docs, int numberOfProcessors)
-        {
-            threadList = new Thread[numberOfProcessors];
-            index = new AtomicInteger(0);
-            loopIndex = new AtomicInteger(0);
-            parent = p;
-            documents = docs;
-            isMaster = true;
-            kill = false;
-            thisParent = null;
-        }
-
-        public void killSwitch() { kill = true; }
-
-        public DoubleDoc getNewJob()
-        {
-            if(index.get() >= documents.size()) return null;
-            int lI = loopIndex.getAndIncrement();
-            if(lI >= documents.size())
-            {
-                loopIndex.set(0);
-                index.incrementAndGet();
-                lI = loopIndex.getAndIncrement();
-            }
-            int i = index.get();
-            if(i >= documents.size()) return null;
-            return new DoubleDoc(documents.get(i), documents.get(lI), -1);
-        }
-
-        public void calculateScore(List<String> doc1, List<String> doc2)
-        {
-            parent.getSim1(doc1, doc2);
-            parent.getSim2(doc1, doc2);
-        }
-
-        @Override
-        public void run() {
-
-            if(isMaster)
-            {
-                for(int i = 0; i < threadList.length; i++)
-                {
-                    threadList[i] = new Thread(new GenerateScores(parent, documents, false, this, 0));
-                    threadList[i].start();
-                }
-//                System.out.println("Threads Started.");
-                for(int i = 0; i < threadList.length; i++)
-                {
-                    try {
-//                        System.out.println("Waiting on Thread " + i);
-                        threadList[i].join();
-                    } catch (InterruptedException ex) {
-                        Logger.getLogger(MMR.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                }
-            }
-            else
-            {
-                DoubleDoc job;
-                while((job = thisParent.getNewJob()) != null) calculateScore(job.doc1, job.doc2);
-            }
-
-        }
-
-    }    
-    
-    GenerateScores master;
-    
-    public void startGeneratingScores(List<List<String>> docs, int cpus)
-    {
-        master = new GenerateScores(this, docs, cpus);
-        new Thread(master).start();
-    }
-   
-//</editor-fold>
     
 //<editor-fold defaultstate="collapsed" desc="Utility classes">
     /**
@@ -205,13 +106,13 @@ public class MMR {
 
 //<editor-fold defaultstate="collapsed" desc="Constructors">
     /**
-     * Default constructer uses JaccardSim for both similarity metrics.
+     * Default Constructor uses CosineSim for both similarity metrics.
      */
     public MMR()
     {
         scores = new ConcurrentHashMap<>();
-        sim1 = new JaccardSim();
-        sim2 = new JaccardSim();
+        sim1 = new CosineSim();
+        sim2 = new CosineSim();
     }
     
     public MMR(SimMetric sim1, SimMetric sim2)
@@ -230,9 +131,10 @@ public class MMR {
      * standard relevance ranked list. It is recommended the lambda value be between 
      * 0 and 1.
      * 
-     * @param documentList Documents stored in a list as a list of Strings, representing its words
+     * @param documentList Documents stored in a list as a list of Strings, representing its words. Words should be stemmed and Stopwords removed before passed in
      * @param query A query represented as a list of Strings, representing query words
      * @param lambda The lambda value to determine MMR search ranking
+     * @param omega The omega value is the similarity threshold for a sentence to be added to the retrieved set of documents
      * @param maxResults The maximum size of the returned resulting ranked list.
      * @return The list of ranked sentences, ranked according to the lambda value
      */
@@ -274,17 +176,18 @@ public class MMR {
     }
     
     /**
-     * Returns a ranked list given the a list of documents, a query, and a lambda value.
-     * The list will be ranked according to the lambda value. A lambda value of 0 will
+     * Returns a list of Document_Score objects given the a list of documents, a query, and a lambda value.
+     * Theis list will be ranked according to the lambda value. A lambda value of 0 will
      * return a list ranked more on diversity while a lambda value of 1 will return a 
      * standard relevance ranked list. It is recommended the lambda value be between 
-     * 0 and 1.
+     * 0 and 1. The Document_Score object returns both the document and its MMR score.
      * 
-     * @param documentList Documents stored in a list as a list of Strings, representing its words. Words should be stemmed and Stopwords removed before being sent here
+     * @param documentList Documents stored in a list as a list of Strings, representing its words. Words should be stemmed and Stopwords removed before being passed in
      * @param query A query represented as a list of Strings, representing query words
      * @param lambda The lambda value to determine MMR search ranking
+     * @param omega The omega value is the similarity threshold for a sentence to be added to the retrieved set of documents
      * @param maxResults The maximum size of the returned resulting ranked list.
-     * @return The list of ranked sentences, ranked according to the lambda value
+     * @return The list of Document_Scores which contains both the document and its MMR score
      */
     public List<Document_Score> rankedAndList(List<List<String>> documentList, List<String> query, double lambda, double omega, int maxResults)
     {

@@ -15,16 +15,24 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 
 /**
  *
+ * This is the Main class that was programmed specifically to receive specific test
+ * data and process it through MMR to get a summary back. 
+ * 
+ * Apologies for the very messy code. I was trying to get the the code up and running to get the
+ * results as quickly as possible and just slung right through it to get something usable.
+ * 
+ * It implements runnable so that it can execute as quickly as possible because it was 
+ * quite slow to start. Because each document is processed individually (and even some
+ * MMR and LexRank parameters are processed individually) this made this program a prime 
+ * target for parallelization.
+ * 
+ * I would not use this Main method for any further work as it is very specific for the task
+ * that we needed it for. You can base any new Main class off of the initializations present
+ * in this class.
+ * 
  * @author Matthew Lai
  */
 public class Main implements Runnable{
@@ -36,7 +44,7 @@ public class Main implements Runnable{
         AtomicInteger queryBias;
         public ThreadTracker(int maxThreads) throws IOException
         {
-            topicIndex = new AtomicInteger(1);
+            topicIndex = new AtomicInteger(0);
             simThreshold = new AtomicInteger(0);
             queryBias = new AtomicInteger(6);
             for(int i = 0; i < maxThreads; i++) threadCreator();
@@ -72,7 +80,7 @@ public class Main implements Runnable{
     Thread thisThread;
     ThreadTracker parentTracker;
     
-    static final String outputLocation = "C:\\Users\\Matthew Lai\\Documents\\Work\\Graduate Work\\2014 Spring\\CS517\\MMR Output\\";
+    static final String outputLocation = "C:\\Users\\Matthew Lai\\Documents\\Work\\Graduate Work\\2014 Spring\\CS517\\MMR Output\\"; 
     static final String topicNames[] = {"Robert Rubin", "Stephen Hawking", "Desmond Tutu", "Brian Jones", "Gene Autry"};
     
     final int resultNum = 10;
@@ -219,7 +227,7 @@ public class Main implements Runnable{
                             System.out.format("LexRank Similarity Threshold of %.1f\nLexRank Query Bias of %.1f\nMMR Bias of %.1f\n\n", simThresh, queryBias, MMRBias);
                             outputFile1 = new PrintWriter(new BufferedWriter(new FileWriter(new File(newDir.getCanonicalPath() + "\\" + paths[topicIndex].getName() + "_q" + (queryNum + 1) + ".LexRank-Cosine" + "ST-"+ String.format("%.1f", simThresh) + "_qB-" + String.format("%.1f", queryBias) +"_MMRB-"+String.format("%.1f", MMRBias) + ".system" ))));
                             results = mmr1.rankedList(p[topicIndex].getStemmedDocument(), queries[topicIndex].get(queryNum), MMRBias, simThresh, resultNum);
-                            for(List<String> sentence : results) outputFile1.println(p[topicIndex].getSentence(sentence));
+                            for(List<String> sentence : results) outputFile1.print(p[topicIndex].getSentence(sentence) + "\n");
                             outputFile1.close();
                             
                             if(topicIndex == 0 && simThresh == 0 && queryBias == .7)
@@ -228,7 +236,7 @@ public class Main implements Runnable{
                                 System.out.format("MMR Bias of %.1f\n\n", MMRBias);
                                 outputFile2 = new PrintWriter(new BufferedWriter(new FileWriter(new File(outputLocation + "\\" + paths[topicIndex].getName() + "_q" + (queryNum + 1) + ".Cosine-Cosine_"+String.format("%.1f",MMRBias)+"MMRBias"))));
                                 results = mmr2.rankedList(p[topicIndex].getStemmedDocument(), queries[topicIndex].get(queryNum), MMRBias, simThresh, resultNum);
-                                for(List<String> sentence : results) outputFile2.println(p[topicIndex].getSentence(sentence));
+                                for(List<String> sentence : results) outputFile2.print(p[topicIndex].getSentence(sentence) + "\n");
                                 outputFile2.close();
                             }
                         }                                                                   // Query Cycle Level End

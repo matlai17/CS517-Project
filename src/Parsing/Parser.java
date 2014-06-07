@@ -81,6 +81,12 @@ public class Parser {
         stemDocument(document);
     }
     
+    /**
+     * Parses document into sentences, stems, and removes stops words before adding it to hashmaps and lists to be used by the MMR and other Sim
+     * classes
+     * 
+     * @param document the target document to be parsed and stemmed.
+     */
     private void stemDocument(String document)
     {
         document = document.replaceAll("<P>|</P>", "");
